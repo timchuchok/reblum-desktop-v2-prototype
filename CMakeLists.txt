@@ -16,17 +16,23 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/generated/config.h
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Concurrent)
 
 set(SOURCES
     src/main.cpp
     src/app/Application.cpp
+    src/app/ImageController.cpp
     src/ui/main_window/MainWindow.cpp
+    src/ui/widgets/ImageView.cpp
 )
 
 set(HEADERS
     src/app/Application.h
+    src/app/ImageController.h
+    src/core/image/ImageModel.h
+    src/core/viewport/ViewState.h
     src/ui/main_window/MainWindow.h
+    src/ui/widgets/ImageView.h
 )
 
 add_executable(reblum
@@ -41,6 +47,7 @@ target_link_libraries(reblum PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
+    Qt6::Concurrent
 )
 
 if(APPLE)
