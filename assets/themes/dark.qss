@@ -1,0 +1,89 @@
+/* ============================================================
+   Reblum — Dark Theme
+   ============================================================ */
+
+QWidget {
+    background-color: #111111;
+    color: #d0d0d0;
+    font-family: "Inter", "SF Pro Text", "Segoe UI", sans-serif;
+    font-size: 12px;
+}
+
+/* ── Top bar ─────────────────────────────────────────────── */
+QWidget#TopBar {
+    background-color: #0d0d0d;
+    border-bottom: 1px solid #222222;
+}
+
+QLabel#ImageMeta {
+    color: #888888;
+    font-size: 11px;
+}
+
+QLabel#FileName {
+    color: #cccccc;
+    font-size: 11px;
+}
+
+QLabel#TrialBadge {
+    color: #888888;
+    font-size: 11px;
+    padding: 2px 8px;
+    border: 1px solid #333333;
+    border-radius: 3px;
+}
+
+/* ── Image area ──────────────────────────────────────────── */
+QWidget#ImageArea {
+    background-color: #0a0a0a;
+}
+
+/* ── Right panel ─────────────────────────────────────────── */
+QWidget#RightPanel {
+    background-color: #161616;
+    border-left: 1px solid #222222;
+}
+
+QLabel#PanelPlaceholder {
+    color: #444444;
+    font-size: 11px;
+}
+
+/* ── Bottom bar ──────────────────────────────────────────── */
+QWidget#BottomBar {
+    background-color: #0d0d0d;
+    border-top: 1px solid #222222;
+}
+
+QPushButton#ZoomFit,
+QPushButton#Zoom100 {
+    background-color: transparent;
+    color: #777777;
+    border: none;
+    font-size: 11px;
+    padding: 2px 8px;
+}
+
+QPushButton#ZoomFit:hover,
+QPushButton#Zoom100:hover {
+    color: #cccccc;
+}
+
+QPushButton#ZoomFit:checked,
+QPushButton#Zoom100:checked {
+    color: #ffffff;
+}
+
+QPushButton#ExportButton {
+    background-color: #c8622a;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 18px;
+}
+
+QPushButton#ExportButton:hover {
+    background-color: #d9703a;
+}
