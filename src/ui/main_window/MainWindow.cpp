@@ -1,22 +1,19 @@
 #include "MainWindow.h"
 
-#include <QLabel>
-#include <QWidget>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QLabel>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
 
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
-{
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Reblum");
     setMinimumSize(1000, 650);
     resize(1280, 800);
     setupUi();
 }
 
-void MainWindow::setupUi()
-{
+void MainWindow::setupUi() {
     auto* central = new QWidget(this);
     setCentralWidget(central);
 
@@ -36,7 +33,8 @@ void MainWindow::setupUi()
     auto* metaLabel = new QLabel("3440 × 5162 px", topBar);
     metaLabel->setObjectName("ImageMeta");
 
-    auto* fileLabel = new QLabel("IMG_ROBERT-JAMES_Portrait_Retouch_Photo_Load_Edit.jpg", topBar);
+    auto* fileLabel = new QLabel(
+        "IMG_ROBERT-JAMES_Portrait_Retouch_Photo_Load_Edit.jpg", topBar);
     fileLabel->setObjectName("FileName");
 
     auto* trialLabel = new QLabel("Free trial — 3 days left", topBar);
