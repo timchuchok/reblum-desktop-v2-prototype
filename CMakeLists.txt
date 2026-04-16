@@ -21,6 +21,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Concurrent ShaderTools)
 set(SOURCES
     src/main.cpp
     src/app/Application.cpp
+    src/app/ThemeManager.cpp
     src/app/ImageController.cpp
     src/app/EffectsController.cpp
     src/rendering/Renderer.cpp
@@ -34,6 +35,7 @@ set(SOURCES
 
 set(HEADERS
     src/app/Application.h
+    src/app/ThemeManager.h
     src/app/ImageController.h
     src/app/EffectsController.h
     src/core/image/ImageModel.h

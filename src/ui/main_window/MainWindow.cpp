@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 
+#include <QActionGroup>
+#include <QApplication>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QFileDialog>
@@ -11,6 +13,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "app/Application.h"
+#include "app/ThemeManager.h"
 #include "ui/panels/RightPanel.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -120,6 +124,28 @@ void MainWindow::setupMenu() {
     auto* openAction = fileMenu->addAction(tr("Open Image…"));
     openAction->setShortcut(QKeySequence::Open);
     connect(openAction, &QAction::triggered, this, &MainWindow::openImage);
+
+    auto* themeMenu = menuBar()->addMenu(tr("Theme"));
+    auto* themeGroup = new QActionGroup(this);
+    themeGroup->setExclusive(true);
+
+    auto* darkAction = themeMenu->addAction(tr("Dark"));
+    darkAction->setCheckable(true);
+    darkAction->setChecked(true);
+    themeGroup->addAction(darkAction);
+
+    auto* lightAction = themeMenu->addAction(tr("Light"));
+    lightAction->setCheckable(true);
+    themeGroup->addAction(lightAction);
+
+    auto* tm = static_cast<Application*>(qApp)->themeManager();
+    darkAction->setChecked(tm->current() == ThemeManager::Theme::Dark);
+    lightAction->setChecked(tm->current() == ThemeManager::Theme::Light);
+
+    connect(darkAction, &QAction::triggered, this,
+            [tm]() { tm->apply(ThemeManager::Theme::Dark); });
+    connect(lightAction, &QAction::triggered, this,
+            [tm]() { tm->apply(ThemeManager::Theme::Light); });
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
