@@ -34,8 +34,7 @@ reblum-desktop-v2-prototype/
 ├── assets/
 │   ├── shaders/
 │   │   ├── fullscreen.vert
-│   │   ├── orange.frag
-│   │   └── green.frag
+│   │   └── image.frag        ← single pass: orange + green in one shader
 │   ├── themes/
 │   │   └── dark.qss
 │   └── translations/
@@ -57,27 +56,24 @@ reblum-desktop-v2-prototype/
 │   │   │   ├── ImageModel.h
 │   │   │   └── ImageModel.cpp
 │   │   ├── effects/
-│   │   │   └── EffectSettings.h      ← struct { float opacity, threshold; bool enabled; }
+│   │   │   └── EffectSettings.h      ← struct { float opacity, threshold; bool enabled; QColor color; }
 │   │   └── viewport/
 │   │       ├── ViewState.h           ← struct { float zoom; QPointF offset; }
 │   │       └── ViewState.cpp
 │   │
 │   ├── rendering/                    # RHI pipeline
-│   │   ├── RhiWidget.h/cpp           ← QRhiWidget
-│   │   ├── Renderer.h/cpp            ← setImage, setEffects, render
-│   │   └── ShaderProgram.h/cpp
+│   │   └── Renderer.h/cpp            ← setImage, setEffects, render(cb, rt, rect, dpr)
 │   │
 │   └── ui/                           # Qt Widgets
 │       ├── main_window/
-│       │   └── MainWindow.h/cpp      ← builds UI, delegates to AppController
+│       │   └── MainWindow.h/cpp      ← builds UI, handles DnD, delegates to controllers
 │       ├── panels/
 │       │   ├── RightPanel.h/cpp
 │       │   └── EffectPanel.h/cpp     ← single class for both Orange and Green
 │       ├── widgets/
-│       │   ├── ImageView.h/cpp       ← wrapper over RhiWidget
+│       │   ├── ImageView.h/cpp       ← QRhiWidget: events + viewport, owns Renderer
 │       │   ├── GradientSlider.h/cpp
-│       │   ├── EyeButton.h/cpp
-│       │   └── ProgressBar.h/cpp
+│       │   └── EyeButton.h/cpp
 │       └── topbar/
 │           ├── TopBar.h
 │           └── TopBar.cpp
@@ -114,17 +110,18 @@ void pan(QPoint delta);
 
 ### EffectsController
 ```cpp
-void setOrangeOpacity(float);
-void setOrangeThreshold(float);
-void setGreenOpacity(float);
-void setGreenThreshold(float);
-void setEffectEnabled(EffectType, bool);
+void setOrangeOpacity(float opacity);
+void setOrangeThreshold(float threshold);
+void setOrangeEnabled(bool enabled);
+void setGreenOpacity(float opacity);
+void setGreenThreshold(float threshold);
+void setGreenEnabled(bool enabled);
 ```
 
 ### MainWindow
 - Builds the UI
-- Delegates everything to AppController
-- Subscribes to controller signals
+- Handles drag-and-drop at window level (QRhiWidget's Metal layer absorbs drops on macOS)
+- Delegates everything to controllers
 
 ```cpp
 connect(slider, &QSlider::valueChanged, this, [=](int v) {
@@ -137,9 +134,10 @@ connect(slider, &QSlider::valueChanged, this, [=](int v) {
 ```cpp
 // core/effects/EffectSettings.h
 struct EffectSettings {
-    float opacity   = 0.0f;  // 0..1
-    float threshold = 0.5f;  // 0..1
-    bool  enabled   = true;
+    float  opacity   = 0.0f;    // 0..1
+    float  threshold = 0.5f;    // 0..1
+    bool   enabled   = true;
+    QColor color     = Qt::white;
 };
 
 // core/viewport/ViewState.h
@@ -157,23 +155,28 @@ class EffectPanel : public QWidget {
 
 ## Shader Logic
 
+Single pass (`image.frag`). Both effects read from the original pixel — they do not
+interact, so two separate passes would add complexity with no benefit.
+
 ```glsl
 // Orange — highlights (bright pixels)
-if (luminance > threshold) {
-    color = mix(color, orangeColor, opacity);
-}
+if (orangeEnabled && luminance > orangeThreshold)
+    color = mix(color, orangeColor.rgb, orangeOpacity);
 
 // Green — shadows (dark pixels)
-if (luminance < threshold) {
-    color = mix(color, greenColor, opacity);
-}
+if (greenEnabled && luminance < greenThreshold)
+    color = mix(color, greenColor.rgb, greenOpacity);
 ```
+
+Colors are passed via `FragUBO` (vec4 at offsets 32/48, std140). This means color
+can be changed from the CPU side without touching the shader.
 
 ## Extensibility
 
 | Task | What to change |
 |---|---|
-| New effect | Add `EffectSettings` field + new `.frag` shader |
+| New effect (same pass) | Add fields to `EffectSettings` + `FragUBO`, extend `image.frag` |
+| New effect (multi-pass) | Add intermediate `QRhiTexture` RT in `Renderer`, new `.frag` shader |
 | Undo/Redo | `QUndoCommand` pushed via `AppController` |
 | New theme | New `.qss` file in `assets/themes/` |
 | New language | New `.ts` file in `assets/translations/` |

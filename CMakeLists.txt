@@ -16,13 +16,14 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/generated/config.h
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Concurrent)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Concurrent ShaderTools)
 
 set(SOURCES
     src/main.cpp
     src/app/Application.cpp
     src/app/ImageController.cpp
     src/app/EffectsController.cpp
+    src/rendering/Renderer.cpp
     src/ui/main_window/MainWindow.cpp
     src/ui/widgets/ImageView.cpp
     src/ui/widgets/GradientSlider.cpp
@@ -38,6 +39,7 @@ set(HEADERS
     src/core/image/ImageModel.h
     src/core/effects/EffectSettings.h
     src/core/viewport/ViewState.h
+    src/rendering/Renderer.h
     src/ui/main_window/MainWindow.h
     src/ui/widgets/ImageView.h
     src/ui/widgets/GradientSlider.h
@@ -52,11 +54,20 @@ add_executable(reblum
     resources/resources.qrc
 )
 
+qt6_add_shaders(reblum "reblum_shaders"
+    GLSL "440"
+    PREFIX "/shaders"
+    FILES
+        assets/shaders/fullscreen.vert
+        assets/shaders/image.frag
+)
+
 target_include_directories(reblum PRIVATE src ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 target_link_libraries(reblum PRIVATE
     Qt6::Core
     Qt6::Gui
+    Qt6::GuiPrivate
     Qt6::Widgets
     Qt6::Concurrent
 )
