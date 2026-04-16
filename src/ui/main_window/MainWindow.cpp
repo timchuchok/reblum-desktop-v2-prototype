@@ -7,12 +7,15 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "ui/panels/RightPanel.h"
+
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Reblum");
     setMinimumSize(1000, 650);
     resize(1280, 800);
 
     m_imageController = new ImageController(this);
+    m_effectsController = new EffectsController(this);
 
     setupUi();
     setupMenu();
@@ -58,18 +61,7 @@ void MainWindow::setupUi() {
     contentLayout->setSpacing(0);
 
     m_imageView = new ImageView(content);
-
-    auto* rightPanel = new QWidget(content);
-    rightPanel->setObjectName("RightPanel");
-    rightPanel->setFixedWidth(200);
-
-    auto* placeholder = new QLabel("Orange\n——\nGreen", rightPanel);
-    placeholder->setObjectName("PanelPlaceholder");
-    placeholder->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    auto* rpLayout = new QVBoxLayout(rightPanel);
-    rpLayout->setContentsMargins(12, 16, 12, 16);
-    rpLayout->addWidget(placeholder);
-    rpLayout->addStretch();
+    auto* rightPanel = new RightPanel(m_effectsController, content);
 
     contentLayout->addWidget(m_imageView, 1);
     contentLayout->addWidget(rightPanel);

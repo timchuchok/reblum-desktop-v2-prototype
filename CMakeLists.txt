@@ -22,17 +22,28 @@ set(SOURCES
     src/main.cpp
     src/app/Application.cpp
     src/app/ImageController.cpp
+    src/app/EffectsController.cpp
     src/ui/main_window/MainWindow.cpp
     src/ui/widgets/ImageView.cpp
+    src/ui/widgets/GradientSlider.cpp
+    src/ui/widgets/EyeButton.cpp
+    src/ui/panels/EffectPanel.cpp
+    src/ui/panels/RightPanel.cpp
 )
 
 set(HEADERS
     src/app/Application.h
     src/app/ImageController.h
+    src/app/EffectsController.h
     src/core/image/ImageModel.h
+    src/core/effects/EffectSettings.h
     src/core/viewport/ViewState.h
     src/ui/main_window/MainWindow.h
     src/ui/widgets/ImageView.h
+    src/ui/widgets/GradientSlider.h
+    src/ui/widgets/EyeButton.h
+    src/ui/panels/EffectPanel.h
+    src/ui/panels/RightPanel.h
 )
 
 add_executable(reblum
