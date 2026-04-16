@@ -1,6 +1,9 @@
 #include "EffectsController.h"
 
-EffectsController::EffectsController(QObject* parent) : QObject(parent) {}
+EffectsController::EffectsController(QObject* parent) : QObject(parent) {
+    m_orange.color = QColor(200, 99, 42);
+    m_green.color = QColor(58, 138, 80);
+}
 
 void EffectsController::setOrangeOpacity(float opacity) {
     m_orange.opacity = opacity;

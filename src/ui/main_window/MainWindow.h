@@ -13,6 +13,10 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override = default;
 
+protected:
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
+
 private:
     void setupUi();
     void setupMenu();

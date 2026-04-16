@@ -1,8 +1,12 @@
 #include "MainWindow.h"
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QImageReader>
 #include <QMenuBar>
+#include <QMimeData>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -13,6 +17,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Reblum");
     setMinimumSize(1000, 650);
     resize(1280, 800);
+    setAcceptDrops(true);
 
     m_imageController = new ImageController(this);
     m_effectsController = new EffectsController(this);
@@ -117,11 +122,42 @@ void MainWindow::setupMenu() {
     connect(openAction, &QAction::triggered, this, &MainWindow::openImage);
 }
 
+void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
+    if (!event->mimeData()->hasUrls()) {
+        return;
+    }
+    for (const QUrl& url : event->mimeData()->urls()) {
+        if (url.isLocalFile() &&
+            !QImageReader::imageFormat(url.toLocalFile()).isEmpty()) {
+            event->acceptProposedAction();
+            return;
+        }
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent* event) {
+    for (const QUrl& url : event->mimeData()->urls()) {
+        if (url.isLocalFile() &&
+            !QImageReader::imageFormat(url.toLocalFile()).isEmpty()) {
+            m_imageController->loadImage(url.toLocalFile());
+            event->acceptProposedAction();
+            return;
+        }
+    }
+}
+
 void MainWindow::connectSignals() {
     connect(m_imageController, &ImageController::imageLoaded, this,
             &MainWindow::onImageLoaded);
-    connect(m_imageView, &ImageView::fileDropped, m_imageController,
-            &ImageController::loadImage);
+
+    auto syncEffects = [this]() {
+        m_imageView->setEffects(m_effectsController->orangeSettings(),
+                                m_effectsController->greenSettings());
+    };
+    connect(m_effectsController, &EffectsController::orangeSettingsChanged,
+            this, [syncEffects](const EffectSettings&) { syncEffects(); });
+    connect(m_effectsController, &EffectsController::greenSettingsChanged, this,
+            [syncEffects](const EffectSettings&) { syncEffects(); });
 }
 
 void MainWindow::openImage() {

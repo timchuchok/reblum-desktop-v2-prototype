@@ -9,7 +9,7 @@
 RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     : QWidget(parent) {
     setObjectName("RightPanel");
-    setFixedWidth(200);
+    setFixedWidth(294);
 
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(12, 16, 12, 16);
