@@ -44,9 +44,24 @@ QWidget#RightPanel {
     border-left: 1px solid #222222;
 }
 
-QLabel#PanelPlaceholder {
-    color: #444444;
-    font-size: 11px;
+QLabel#EffectName {
+    color: #cccccc;
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+}
+
+QLabel#SliderLabel {
+    color: #666666;
+    font-size: 10px;
+    background: transparent;
+}
+
+QFrame#PanelSeparator {
+    color: #2a2a2a;
+    background-color: #2a2a2a;
+    border: none;
+    max-height: 1px;
 }
 
 /* ── Bottom bar ──────────────────────────────────────────── */
