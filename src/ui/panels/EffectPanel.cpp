@@ -47,7 +47,6 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     layout->addWidget(thresholdLabel);
     layout->addWidget(m_thresholdSlider);
 
-    // ── Connections ───────────────────────────────────────
     connect(m_opacitySlider, &GradientSlider::valueChanged, this,
             &EffectPanel::opacityChanged);
     connect(m_thresholdSlider, &GradientSlider::valueChanged, this,

@@ -3,8 +3,8 @@
 #include <QFrame>
 #include <QVBoxLayout>
 
-#include "app/EffectsController.h"
 #include "EffectPanel.h"
+#include "app/EffectsController.h"
 
 RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     : QWidget(parent) {
