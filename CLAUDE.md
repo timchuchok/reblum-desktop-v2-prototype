@@ -13,7 +13,9 @@
 ```
 UI (EffectPanel / ImageView)
    ↓ signal
-AppController (orchestrator)
+MainWindow (UI wiring only)
+   ↓
+AppController (owns controllers + QUndoStack)
    ↓
 ImageController / EffectsController
    ↓
@@ -35,55 +37,46 @@ reblum-desktop-v2-prototype/
 │   ├── shaders/
 │   │   ├── fullscreen.vert
 │   │   └── image.frag        ← single pass: orange + green in one shader
-│   ├── themes/
-│   │   └── dark.qss
-│   └── translations/
-│       ├── app_en.ts
-│       └── app_uk.ts
+│   ├── icons/
+│   │   ├── eye-show.svg
+│   │   ├── slider-thumb.svg
+│   │   ├── slider-thumb-hover.svg
+│   │   └── slider-thumb-disabled.svg
+│   └── themes/
+│       ├── dark.qss
+│       └── light.qss
 │
 ├── src/
 │   ├── main.cpp
 │   │
 │   ├── app/                          # orchestration
 │   │   ├── Application.h/cpp
-│   │   ├── AppController.h/cpp       ← connects controllers, owns QUndoStack
-│   │   ├── ImageController.h/cpp     ← load, zoom, pan
+│   │   ├── AppController.h/cpp       ← owns controllers + QUndoStack
+│   │   ├── ImageController.h/cpp     ← async image load via QtConcurrent
 │   │   ├── EffectsController.h/cpp   ← opacity, threshold, enabled
-│   │   └── ThemeManager.h/cpp        ← themes + localization
+│   │   └── ThemeManager.h/cpp        ← dark / light QSS themes
 │   │
 │   ├── core/                         # business logic (no Qt UI)
 │   │   ├── image/
-│   │   │   ├── ImageModel.h
-│   │   │   └── ImageModel.cpp
+│   │   │   └── ImageModel.h          ← struct { QImage; QString path, fileName; }
 │   │   ├── effects/
 │   │   │   └── EffectSettings.h      ← struct { float opacity, threshold; bool enabled; QColor color; }
 │   │   └── viewport/
-│   │       ├── ViewState.h           ← struct { float zoom; QPointF offset; }
-│   │       └── ViewState.cpp
+│   │       └── ViewState.h           ← struct { float zoom; QPointF offset; }
 │   │
 │   ├── rendering/                    # RHI pipeline
 │   │   └── Renderer.h/cpp            ← setImage, setEffects, render(cb, rt, rect, dpr)
 │   │
 │   └── ui/                           # Qt Widgets
 │       ├── main_window/
-│       │   └── MainWindow.h/cpp      ← builds UI, handles DnD, delegates to controllers
+│       │   └── MainWindow.h/cpp      ← builds UI, handles DnD, owns controllers
 │       ├── panels/
 │       │   ├── RightPanel.h/cpp
 │       │   └── EffectPanel.h/cpp     ← single class for both Orange and Green
-│       ├── widgets/
-│       │   ├── ImageView.h/cpp       ← QRhiWidget: events + viewport, owns Renderer
-│       │   ├── GradientSlider.h/cpp
-│       │   └── EyeButton.h/cpp
-│       └── topbar/
-│           ├── TopBar.h
-│           └── TopBar.cpp
-│
-├── tests/
-│   ├── CMakeLists.txt
-│   └── core/
-│       ├── test_ImageModel.cpp
-│       ├── test_EffectSettings.cpp
-│       └── test_ViewState.cpp
+│       └── widgets/
+│           ├── ImageView.h/cpp       ← QRhiWidget: events + viewport, owns Renderer
+│           ├── GradientSlider.h/cpp
+│           └── EyeButton.h/cpp
 │
 └── resources/
     └── resources.qrc
@@ -92,21 +85,28 @@ reblum-desktop-v2-prototype/
 ## Responsibilities
 
 ### AppController
-- Pure orchestration — does not think, only connects
-- Owns `QUndoStack`
-- Connects controllers to each other via signals
+- Owns `ImageController`, `EffectsController`, `QUndoStack`
+- Wires inter-controller signals (e.g., `imageLoaded` → reset effects)
+- Does not touch widgets
+
+### MainWindow
+- Builds the UI
+- Owns `AppController`
+- Handles drag-and-drop at window level (QRhiWidget's Metal layer absorbs drops on macOS)
+- Wires UI signals to controllers and controller signals to UI
 
 ```cpp
-connect(imageController, &ImageController::imageLoaded,
-        effectsController, &EffectsController::reset);
+auto* ic = m_appController->imageController();
+auto* ec = m_appController->effectsController();
+connect(ic, &ImageController::imageLoaded, this, &MainWindow::onImageLoaded);
 ```
 
 ### ImageController
 ```cpp
-void loadImage(const QString& path);
-void setZoom(float zoom);
-void pan(QPoint delta);
+void loadImage(const QString& path);   // async via QtConcurrent::run
 ```
+
+Zoom and pan are handled directly in `ImageView` — `ViewState` lives there.
 
 ### EffectsController
 ```cpp
@@ -118,16 +118,10 @@ void setGreenThreshold(float threshold);
 void setGreenEnabled(bool enabled);
 ```
 
-### MainWindow
-- Builds the UI
-- Handles drag-and-drop at window level (QRhiWidget's Metal layer absorbs drops on macOS)
-- Delegates everything to controllers
-
-```cpp
-connect(slider, &QSlider::valueChanged, this, [=](int v) {
-    appController->effectsController()->setOrangeOpacity(v / 100.0f);
-});
-```
+### ImageView (QRhiWidget)
+- Owns `Renderer` and `ViewState`
+- Handles pan (mouse drag), zoom (wheel + pinch gesture), resize
+- Computes `imageRect()` in logical pixels → passes to `Renderer`
 
 ## Core Structures
 
@@ -177,7 +171,28 @@ can be changed from the CPU side without touching the shader.
 |---|---|
 | New effect (same pass) | Add fields to `EffectSettings` + `FragUBO`, extend `image.frag` |
 | New effect (multi-pass) | Add intermediate `QRhiTexture` RT in `Renderer`, new `.frag` shader |
-| Undo/Redo | `QUndoCommand` pushed via `AppController` |
-| New theme | New `.qss` file in `assets/themes/` |
-| New language | New `.ts` file in `assets/translations/` |
-| Unit tests | `core/` has no UI dependency — tested directly |
+| Undo/Redo | Push `QUndoCommand` via `AppController` (already owns `QUndoStack`) |
+| New theme | New `.qss` file in `assets/themes/`, register in `ThemeManager` |
+| Localization | New `.ts` file in `assets/translations/`, load via `QTranslator` in `Application` |
+| Unit tests | `core/` has no UI dependency — test directly with Qt Test or Catch2 |
+
+## Future: Localization
+
+Localization is not yet implemented but the architecture supports it cleanly.
+
+**Planned structure:**
+```
+assets/translations/
+    app_en.ts   ← source strings (English)
+    app_uk.ts   ← Ukrainian
+```
+
+**How to wire it** — in `Application` constructor, load the translator before any window is created:
+```cpp
+QTranslator translator;
+if (translator.load(":/translations/app_uk")) {
+    installTranslator(&translator);
+}
+```
+
+**Scope** — only user-visible strings in `src/ui/` need `tr()`. Core structs and `Renderer` have no user-visible strings. `ThemeManager` path strings are internal — no changes needed there.

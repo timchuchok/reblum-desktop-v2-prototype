@@ -16,11 +16,12 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/generated/config.h
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Concurrent ShaderTools)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Concurrent ShaderTools Svg)
 
 set(SOURCES
     src/main.cpp
     src/app/Application.cpp
+    src/app/AppController.cpp
     src/app/ThemeManager.cpp
     src/app/ImageController.cpp
     src/app/EffectsController.cpp
@@ -35,6 +36,7 @@ set(SOURCES
 
 set(HEADERS
     src/app/Application.h
+    src/app/AppController.h
     src/app/ThemeManager.h
     src/app/ImageController.h
     src/app/EffectsController.h
@@ -72,6 +74,7 @@ target_link_libraries(reblum PRIVATE
     Qt6::GuiPrivate
     Qt6::Widgets
     Qt6::Concurrent
+    Qt6::Svg
 )
 
 if(APPLE)

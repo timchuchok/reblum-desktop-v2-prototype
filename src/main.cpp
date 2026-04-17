@@ -5,6 +5,7 @@ int main(int argc, char* argv[]) {
     Application app(argc, argv);
 
     MainWindow window;
+    app.themeManager()->apply(app.themeManager()->current());
     window.show();
 
     return app.exec();
