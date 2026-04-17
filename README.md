@@ -11,7 +11,7 @@ Desktop image viewer with real-time highlight/shadow color grading, built on Qt 
 | Qt | 6.7+ (Core, Gui, GuiPrivate, Widgets, Concurrent, ShaderTools, Svg) |
 | CMake | 3.20+ |
 | C++ | 17 |
-| Platform | macOS 13+ (primary), Windows 10/11, Linux (untested) |
+| Platform | macOS 13+, Windows 10/11 |
 
 > **Note:** `Qt6::ShaderTools` is required — it compiles `.vert`/`.frag` sources into `.qsb` binaries at build time via `qt6_add_shaders`.
 
@@ -21,7 +21,7 @@ Desktop image viewer with real-time highlight/shadow color grading, built on Qt 
 
 ```bash
 # 1. Clone
-git clone <repo-url>
+git clone https://github.com/timchuchok/reblum-desktop-v2-prototype.git
 cd reblum-desktop-v2-prototype
 
 # 2. Configure
@@ -31,7 +31,6 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
 
 # 4. Run
-./build/reblum          # Linux
 open build/reblum.app   # macOS
 ```
 
@@ -63,7 +62,7 @@ After `macdeployqt`, the `.app` is self-contained and can be zipped or distribut
 
 ### Prerequisites
 
-1. **Qt 6.6+** — install via the [Qt Online Installer](https://www.qt.io/download-qt-installer). Select the component for your compiler:
+1. **Qt 6.7+** — install via the [Qt Online Installer](https://www.qt.io/download-qt-installer). Select the component for your compiler:
    - `MSVC 2022 64-bit` — recommended
    - `MinGW 13.1 64-bit` — alternative if you don't have Visual Studio
 2. **CMake 3.20+** — bundled with Visual Studio 2022, or install from [cmake.org](https://cmake.org/download/)
@@ -74,7 +73,7 @@ After `macdeployqt`, the `.app` is self-contained and can be zipped or distribut
 Open **"x64 Native Tools Command Prompt for VS 2022"**, then:
 
 ```bat
-git clone <repo-url>
+git clone https://github.com/timchuchok/reblum-desktop-v2-prototype.git
 cd reblum-desktop-v2-prototype
 
 cmake -B build -G "Visual Studio 17 2022" -A x64 ^
@@ -216,6 +215,8 @@ FragUBO (64 bytes)
 | New theme | New `.qss` in `assets/themes/`, register in `ThemeManager` |
 | New language | New `.ts` in `assets/translations/` |
 | Unit tests | `src/core/` has no UI dependency — test directly with Qt Test or Catch2 |
+
+
 
 ---
 
