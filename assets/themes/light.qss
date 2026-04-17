@@ -109,6 +109,7 @@ QPushButton#ExportButton {
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
+    padding: 0px 12px;
 }
 
 QPushButton#ExportButton:hover {

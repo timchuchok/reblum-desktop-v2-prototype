@@ -35,7 +35,7 @@ QLabel#TrialBadge {
     letter-spacing: 0px;
     padding: 2px 8px;
     border: 1px solid #333333;
-    border-radius: 3px;
+border-radius: 3px;
 }
 
 /* ── Effect progress bar ─────────────────────────────────── */
@@ -109,6 +109,7 @@ QPushButton#ExportButton {
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
+    padding: 0px 12px;
 }
 
 QPushButton#ExportButton:hover {
