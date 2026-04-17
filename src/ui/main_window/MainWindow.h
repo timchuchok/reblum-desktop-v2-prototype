@@ -3,8 +3,7 @@
 #include <QLabel>
 #include <QMainWindow>
 
-#include "app/EffectsController.h"
-#include "app/ImageController.h"
+#include "app/AppController.h"
 #include "ui/widgets/ImageView.h"
 
 class MainWindow : public QMainWindow {
@@ -24,8 +23,7 @@ private:
     void openImage();
     void onImageLoaded(const ImageModel& model);
 
-    ImageController* m_imageController = nullptr;
-    EffectsController* m_effectsController = nullptr;
+    AppController* m_appController = nullptr;
     ImageView* m_imageView = nullptr;
     QLabel* m_metaLabel = nullptr;
     QLabel* m_fileLabel = nullptr;

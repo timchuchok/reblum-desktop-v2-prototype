@@ -53,12 +53,11 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
 
     // Orange threshold: dark→light (highlights = bright pixels, right side)
     // Green  threshold: light→dark (shadows  = dark  pixels, left  side)
-    m_thresholdSlider =
-        isOrange
-            ? new GradientSlider(QColor(20, 20, 20), QColor(180, 180, 180),
-                                  m_body)
-            : new GradientSlider(QColor(180, 180, 180), QColor(20, 20, 20),
-                                  m_body);
+    m_thresholdSlider = isOrange
+                            ? new GradientSlider(QColor(20, 20, 20),
+                                                 QColor(180, 180, 180), m_body)
+                            : new GradientSlider(QColor(180, 180, 180),
+                                                 QColor(20, 20, 20), m_body);
 
     bodyLayout->addWidget(opacityLabel);
     bodyLayout->addWidget(m_opacitySlider);
@@ -86,7 +85,8 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     connect(m_thresholdSlider, &GradientSlider::valueChanged, this,
             &EffectPanel::thresholdChanged);
 
-    // Eye button: hold to temporarily disable (compare mode), release to restore
+    // Eye button: hold to temporarily disable (compare mode), release to
+    // restore
     connect(m_eyeBtn, &QAbstractButton::pressed, this,
             [this]() { emit enabledChanged(false); });
     connect(m_eyeBtn, &QAbstractButton::released, this,

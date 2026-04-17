@@ -24,8 +24,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     setAcceptDrops(true);
 
-    m_imageController = new ImageController(this);
-    m_effectsController = new EffectsController(this);
+    m_appController = new AppController(this);
 
     setupUi();
     setupMenu();
@@ -77,7 +76,8 @@ void MainWindow::setupUi() {
 
     m_imageView = new ImageView(content);
     m_imageView->setObjectName("ImageArea");
-    auto* rightPanel = new RightPanel(m_effectsController, content);
+    auto* rightPanel =
+        new RightPanel(m_appController->effectsController(), content);
 
     contentLayout->addWidget(m_imageView, 1);
     contentLayout->addWidget(rightPanel);
@@ -187,7 +187,7 @@ void MainWindow::dropEvent(QDropEvent* event) {
     for (const QUrl& url : event->mimeData()->urls()) {
         if (url.isLocalFile() &&
             !QImageReader::imageFormat(url.toLocalFile()).isEmpty()) {
-            m_imageController->loadImage(url.toLocalFile());
+            m_appController->imageController()->loadImage(url.toLocalFile());
             event->acceptProposedAction();
             return;
         }
@@ -195,16 +195,18 @@ void MainWindow::dropEvent(QDropEvent* event) {
 }
 
 void MainWindow::connectSignals() {
-    connect(m_imageController, &ImageController::imageLoaded, this,
+    auto* ic = m_appController->imageController();
+    auto* ec = m_appController->effectsController();
+
+    connect(ic, &ImageController::imageLoaded, this,
             &MainWindow::onImageLoaded);
 
-    auto syncEffects = [this]() {
-        m_imageView->setEffects(m_effectsController->orangeSettings(),
-                                m_effectsController->greenSettings());
+    auto syncEffects = [this, ec]() {
+        m_imageView->setEffects(ec->orangeSettings(), ec->greenSettings());
     };
-    connect(m_effectsController, &EffectsController::orangeSettingsChanged,
-            this, [syncEffects](const EffectSettings&) { syncEffects(); });
-    connect(m_effectsController, &EffectsController::greenSettingsChanged, this,
+    connect(ec, &EffectsController::orangeSettingsChanged, this,
+            [syncEffects](const EffectSettings&) { syncEffects(); });
+    connect(ec, &EffectsController::greenSettingsChanged, this,
             [syncEffects](const EffectSettings&) { syncEffects(); });
 }
 
@@ -213,7 +215,7 @@ void MainWindow::openImage() {
         this, tr("Open Image"), {},
         tr("Images (*.png *.jpg *.jpeg *.tiff *.bmp)"));
     if (!path.isEmpty()) {
-        m_imageController->loadImage(path);
+        m_appController->imageController()->loadImage(path);
     }
 }
 

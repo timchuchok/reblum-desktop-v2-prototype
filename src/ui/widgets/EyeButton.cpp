@@ -27,7 +27,7 @@ EyeButton::EyeButton(QWidget* parent) : QAbstractButton(parent) {
     setFixedSize(20, 20);
 
     m_icon = renderSvgTinted(":/icons/eye-show.svg", QSize(20, 20),
-                              QColor(210, 210, 210));
+                             QColor(210, 210, 210));
 }
 
 void EyeButton::paintEvent(QPaintEvent*) {

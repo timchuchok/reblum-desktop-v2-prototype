@@ -139,16 +139,19 @@ D3D11 is the safest choice for broad hardware compatibility.
 The project uses a **layered + feature-oriented** decomposition with three isolated worlds:
 
 ```
-UI  ──signals──►  AppController (orchestration)
-                       │
-              ┌────────┴────────┐
-       ImageController    EffectsController
-              │                 │
-        ImageModel         EffectSettings / ViewState
-                                │
-                           Renderer (RHI)
-                                │
-                            GPU shader
+UI (EffectPanel / ImageView)
+   ↓ signal
+MainWindow (UI wiring only)
+   ↓
+AppController (owns controllers + QUndoStack)
+   ↓
+ImageController / EffectsController
+   ↓
+EffectSettings / ViewState (core)
+   ↓
+Renderer (RHI)
+   ↓
+GPU shader
 ```
 
 | Layer | Path | Rule |
@@ -232,9 +235,6 @@ reblum-desktop-v2-prototype/
 │   ├── themes/
 │   │   ├── dark.qss
 │   │   └── light.qss
-│   └── translations/
-│       ├── app_en.ts
-│       └── app_uk.ts
 ├── src/
 │   ├── main.cpp
 │   ├── app/                  # orchestration

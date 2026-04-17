@@ -10,12 +10,9 @@ ImageController::ImageController(QObject* parent)
 }
 
 void ImageController::loadImage(const QString& path) {
-    if (m_watcher->isRunning()) {
-        m_watcher->cancel();
-        m_watcher->waitForFinished();
-    }
-
     m_pendingPath = path;
+    // Do not cancel/wait — QtConcurrent::run cannot be cancelled.
+    // onLoadFinished guards against stale results via m_pendingPath comparison.
     m_watcher->setFuture(QtConcurrent::run([path]() { return QImage(path); }));
 }
 

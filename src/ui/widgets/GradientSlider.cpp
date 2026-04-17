@@ -6,8 +6,8 @@
 #include <QPainter>
 #include <QSvgRenderer>
 
-static constexpr int kHandleR = 7;   // half of 14 px thumb
-static constexpr int kTrackH  = 4;
+static constexpr int kHandleR = 7;  // half of 14 px thumb
+static constexpr int kTrackH = 4;
 
 static QPixmap loadThumb(const QString& path) {
     QSvgRenderer r(path);
@@ -24,8 +24,8 @@ GradientSlider::GradientSlider(QColor fromColor, QColor toColor,
     setFixedHeight(kHandleR * 2);
     setCursor(Qt::PointingHandCursor);
 
-    m_thumbNormal   = loadThumb(":/icons/slider-thumb.svg");
-    m_thumbHover    = loadThumb(":/icons/slider-thumb-hover.svg");
+    m_thumbNormal = loadThumb(":/icons/slider-thumb.svg");
+    m_thumbHover = loadThumb(":/icons/slider-thumb-hover.svg");
     m_thumbDisabled = loadThumb(":/icons/slider-thumb-disabled.svg");
 }
 
@@ -51,11 +51,11 @@ void GradientSlider::paintEvent(QPaintEvent*) {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    const int cy         = height() / 2;
-    const int trackLeft  = kHandleR;
+    const int cy = height() / 2;
+    const int trackLeft = kHandleR;
     const int trackRight = width() - kHandleR;
     const int trackWidth = trackRight - trackLeft;
-    const int fillRight  = trackLeft + static_cast<int>(m_value * trackWidth);
+    const int fillRight = trackLeft + static_cast<int>(m_value * trackWidth);
 
     const QRect trackRect(trackLeft, cy - kTrackH / 2, trackWidth, kTrackH);
 
@@ -79,7 +79,7 @@ void GradientSlider::paintEvent(QPaintEvent*) {
 
     // ── Thumb ─────────────────────────────────────────────────
     const QPixmap& thumb = !isEnabled() ? m_thumbDisabled
-                         : m_hovered    ? m_thumbHover
+                           : m_hovered  ? m_thumbHover
                                         : m_thumbNormal;
     p.setRenderHint(QPainter::SmoothPixmapTransform);
     p.drawPixmap(fillRight - kHandleR, cy - kHandleR, thumb);

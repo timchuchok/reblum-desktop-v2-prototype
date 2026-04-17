@@ -8,8 +8,7 @@ class GradientSlider : public QWidget {
     Q_OBJECT
 public:
     // fromColor = left end (value 0), toColor = right end (value 1)
-    GradientSlider(QColor fromColor, QColor toColor,
-                   QWidget* parent = nullptr);
+    GradientSlider(QColor fromColor, QColor toColor, QWidget* parent = nullptr);
 
     float value() const { return m_value; }
     void setValue(float value);
