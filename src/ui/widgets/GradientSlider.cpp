@@ -1,15 +1,32 @@
 #include "GradientSlider.h"
 
+#include <QEnterEvent>
+#include <QImage>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QSvgRenderer>
 
-static constexpr int kHandleR = 7;
-static constexpr int kTrackH = 4;
+static constexpr int kHandleR = 7;   // half of 14 px thumb
+static constexpr int kTrackH  = 4;
 
-GradientSlider::GradientSlider(QColor color, QWidget* parent)
-    : QWidget(parent), m_color(color) {
+static QPixmap loadThumb(const QString& path) {
+    QSvgRenderer r(path);
+    QImage img(14, 14, QImage::Format_ARGB32_Premultiplied);
+    img.fill(Qt::transparent);
+    QPainter p(&img);
+    r.render(&p);
+    return QPixmap::fromImage(img);
+}
+
+GradientSlider::GradientSlider(QColor fromColor, QColor toColor,
+                               QWidget* parent)
+    : QWidget(parent), m_fromColor(fromColor), m_toColor(toColor) {
     setFixedHeight(kHandleR * 2);
     setCursor(Qt::PointingHandCursor);
+
+    m_thumbNormal   = loadThumb(":/icons/slider-thumb.svg");
+    m_thumbHover    = loadThumb(":/icons/slider-thumb-hover.svg");
+    m_thumbDisabled = loadThumb(":/icons/slider-thumb-disabled.svg");
 }
 
 void GradientSlider::setValue(float value) {
@@ -34,23 +51,48 @@ void GradientSlider::paintEvent(QPaintEvent*) {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    const int cy = height() / 2;
-    const int range = width() - 2 * kHandleR;
-    const int handleX = kHandleR + static_cast<int>(m_value * range);
+    const int cy         = height() / 2;
+    const int trackLeft  = kHandleR;
+    const int trackRight = width() - kHandleR;
+    const int trackWidth = trackRight - trackLeft;
+    const int fillRight  = trackLeft + static_cast<int>(m_value * trackWidth);
 
-    // Track gradient
-    QLinearGradient grad(kHandleR, 0, width() - kHandleR, 0);
-    grad.setColorAt(0.0, QColor(50, 50, 50));
-    grad.setColorAt(1.0, m_color);
+    const QRect trackRect(trackLeft, cy - kTrackH / 2, trackWidth, kTrackH);
 
+    // ── Unfilled track ────────────────────────────────────────
     p.setPen(Qt::NoPen);
-    p.setBrush(grad);
-    p.drawRoundedRect(kHandleR, cy - kTrackH / 2, width() - 2 * kHandleR,
-                      kTrackH, kTrackH / 2.0, kTrackH / 2.0);
+    p.setBrush(QColor(40, 40, 40));
+    p.drawRoundedRect(trackRect, kTrackH / 2.0, kTrackH / 2.0);
 
-    // Handle
-    p.setBrush(QColor(210, 210, 210));
-    p.drawEllipse(QPoint(handleX, cy), kHandleR - 2, kHandleR - 2);
+    // ── Filled portion (0 → value) ────────────────────────────
+    if (m_value > 0.0f) {
+        QLinearGradient grad(trackLeft, 0, trackRight, 0);
+        grad.setColorAt(0.0, m_fromColor);
+        grad.setColorAt(1.0, m_toColor);
+
+        p.save();
+        p.setClipRect(trackLeft, 0, fillRight - trackLeft, height());
+        p.setBrush(grad);
+        p.drawRoundedRect(trackRect, kTrackH / 2.0, kTrackH / 2.0);
+        p.restore();
+    }
+
+    // ── Thumb ─────────────────────────────────────────────────
+    const QPixmap& thumb = !isEnabled() ? m_thumbDisabled
+                         : m_hovered    ? m_thumbHover
+                                        : m_thumbNormal;
+    p.setRenderHint(QPainter::SmoothPixmapTransform);
+    p.drawPixmap(fillRight - kHandleR, cy - kHandleR, thumb);
+}
+
+void GradientSlider::enterEvent(QEnterEvent*) {
+    m_hovered = true;
+    update();
+}
+
+void GradientSlider::leaveEvent(QEvent*) {
+    m_hovered = false;
+    update();
 }
 
 void GradientSlider::mousePressEvent(QMouseEvent* event) {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QProgressBar>
+#include <QPropertyAnimation>
 #include <QWidget>
 
 class EffectPanel;
@@ -12,6 +14,10 @@ public:
                         QWidget* parent = nullptr);
 
 private:
+    void triggerProgress();
+
     EffectPanel* m_orange = nullptr;
     EffectPanel* m_green = nullptr;
+    QProgressBar* m_progressBar = nullptr;
+    QPropertyAnimation* m_progressAnim = nullptr;
 };

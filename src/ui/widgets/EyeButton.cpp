@@ -1,24 +1,36 @@
 #include "EyeButton.h"
 
+#include <QImage>
 #include <QPainter>
+#include <QSvgRenderer>
+
+static QPixmap renderSvgTinted(const QString& path, QSize size, QColor tint) {
+    QSvgRenderer renderer(path);
+    QImage image(size, QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
+
+    QPainter rp(&image);
+    renderer.render(&rp);
+    rp.end();
+
+    // Replace icon color with tint, preserving alpha
+    QPainter tp(&image);
+    tp.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    tp.fillRect(image.rect(), tint);
+    tp.end();
+
+    return QPixmap::fromImage(image);
+}
 
 EyeButton::EyeButton(QWidget* parent) : QAbstractButton(parent) {
-    setCheckable(true);
-    setChecked(true);
     setCursor(Qt::PointingHandCursor);
     setFixedSize(20, 20);
+
+    m_icon = renderSvgTinted(":/icons/eye-show.svg", QSize(20, 20),
+                              QColor(210, 210, 210));
 }
 
 void EyeButton::paintEvent(QPaintEvent*) {
     QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    const QColor color =
-        isChecked() ? QColor(220, 220, 220) : QColor(70, 70, 70);
-    const float r = qMin(width(), height()) / 2.0f - 2.0f;
-    const QPointF center(width() / 2.0f, height() / 2.0f);
-
-    p.setPen(Qt::NoPen);
-    p.setBrush(color);
-    p.drawEllipse(center, r, r);
+    p.drawPixmap(0, 0, m_icon);
 }
