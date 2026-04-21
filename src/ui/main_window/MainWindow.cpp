@@ -5,6 +5,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QFileDialog>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QMenuBar>
@@ -16,6 +17,9 @@
 #include "app/Application.h"
 #include "app/ThemeManager.h"
 #include "ui/panels/RightPanel.h"
+#ifdef Q_OS_MACOS
+#include "platform/MacOSHelper.h"
+#endif
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Reblum");
@@ -67,6 +71,13 @@ void MainWindow::setupUi() {
     topLayout->addWidget(trialLabel);
 
     root->addWidget(topBar);
+    auto makeSep = [central]() -> QFrame* {
+        auto* sep = new QFrame(central);
+        sep->setFrameShape(QFrame::HLine);
+        sep->setObjectName("PanelSeparator");
+        return sep;
+    };
+    root->addWidget(makeSep());
 
     // ── Content (image view + right panel) ────────────────
     auto* content = new QWidget(central);
@@ -124,7 +135,7 @@ void MainWindow::setupUi() {
 
     // Right panel section: Export button, matches right panel width
     auto* rightSection = new QWidget(bottomBar);
-    rightSection->setFixedWidth(294);
+    rightSection->setFixedWidth(293);
     auto* rightSectionLayout = new QHBoxLayout(rightSection);
     rightSectionLayout->setContentsMargins(12, 6, 12, 6);
     rightSectionLayout->setSpacing(0);
@@ -135,11 +146,17 @@ void MainWindow::setupUi() {
 
     rightSectionLayout->addWidget(exportBtn);
 
+    auto* bottomVSep = new QFrame(bottomBar);
+    bottomVSep->setFrameShape(QFrame::VLine);
+    bottomVSep->setObjectName("PanelSeparatorV");
+
     bottomLayout->addWidget(imageSection, 1);
+    bottomLayout->addWidget(bottomVSep);
     bottomLayout->addWidget(rightSection);
 
     // ── Assemble ───────────────────────────────────────────
     root->addWidget(content, 1);
+    root->addWidget(makeSep());
     root->addWidget(bottomBar);
 }
 
@@ -168,6 +185,14 @@ void MainWindow::setupMenu() {
             [tm]() { tm->apply(ThemeManager::Theme::Dark); });
     connect(lightAction, &QAction::triggered, this,
             [tm]() { tm->apply(ThemeManager::Theme::Light); });
+}
+
+void MainWindow::showEvent(QShowEvent* event) {
+    QMainWindow::showEvent(event);
+#ifdef Q_OS_MACOS
+    auto* tm = static_cast<Application*>(qApp)->themeManager();
+    MacOSHelper::setWindowBackground(winId(), tm->current() == ThemeManager::Theme::Dark);
+#endif
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
@@ -200,6 +225,14 @@ void MainWindow::connectSignals() {
 
     connect(ic, &ImageController::imageLoaded, this,
             &MainWindow::onImageLoaded);
+
+#ifdef Q_OS_MACOS
+    auto* tm = static_cast<Application*>(qApp)->themeManager();
+    connect(tm, &ThemeManager::themeChanged, this,
+            [this](ThemeManager::Theme theme) {
+                MacOSHelper::setWindowBackground(winId(), theme == ThemeManager::Theme::Dark);
+            });
+#endif
 
     auto syncEffects = [this, ec]() {
         m_imageView->setEffects(ec->orangeSettings(), ec->greenSettings());

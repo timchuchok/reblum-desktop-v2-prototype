@@ -52,7 +52,14 @@ QProgressBar#EffectProgress::chunk {
 /* ── Right panel ─────────────────────────────────────────── */
 QWidget#RightPanel {
     background-color: #ebebeb;
-    border-left: 1px solid #d0d0d0;
+}
+
+QFrame#PanelSeparatorV {
+    color: #d0d0d0;
+    background-color: #d0d0d0;
+    border: none;
+    min-width: 1px;
+    max-width: 1px;
 }
 
 QLabel#EffectName {
@@ -72,6 +79,7 @@ QFrame#PanelSeparator {
     color: #d0d0d0;
     background-color: #d0d0d0;
     border: none;
+    min-height: 1px;
     max-height: 1px;
 }
 

@@ -13,6 +13,7 @@ public:
     ~MainWindow() override = default;
 
 protected:
+    void showEvent(QShowEvent* event) override;
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
 

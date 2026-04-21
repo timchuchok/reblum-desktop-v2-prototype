@@ -6,5 +6,7 @@
         <file alias="icons/slider-thumb.svg">../assets/icons/slider-thumb.svg</file>
         <file alias="icons/slider-thumb-hover.svg">../assets/icons/slider-thumb-hover.svg</file>
         <file alias="icons/slider-thumb-disabled.svg">../assets/icons/slider-thumb-disabled.svg</file>
+        <file alias="icons/caret-right.svg">../assets/icons/caret-right.svg</file>
+        <file alias="icons/caret-up.svg">../assets/icons/caret-up.svg</file>
     </qresource>
 </RCC>

@@ -2,6 +2,9 @@
 
 #include <QMouseEvent>
 #include <QWheelEvent>
+#ifdef Q_OS_MACOS
+#include "platform/MacOSHelper.h"
+#endif
 
 // ── Construction
 // ──────────────────────────────────────────────────────────────
@@ -56,6 +59,9 @@ void ImageView::setZoom100() {
 
 void ImageView::initialize(QRhiCommandBuffer*) {
     m_renderer.initialize(rhi(), renderTarget());
+#ifdef Q_OS_MACOS
+    MacOSHelper::setViewBackground(winId(), true);
+#endif
 }
 
 void ImageView::render(QRhiCommandBuffer* cb) {

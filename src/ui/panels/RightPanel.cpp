@@ -1,6 +1,7 @@
 #include "RightPanel.h"
 
 #include <QFrame>
+#include <QHBoxLayout>
 #include <QTimer>
 #include <QVBoxLayout>
 
@@ -12,20 +13,36 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     setObjectName("RightPanel");
     setFixedWidth(294);
 
-    auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(12, 16, 12, 16);
+    // ── Outer: vertical separator + content ──────────────
+    auto* outerLayout = new QHBoxLayout(this);
+    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->setSpacing(0);
+
+    auto* leftBorder = new QFrame(this);
+    leftBorder->setFrameShape(QFrame::VLine);
+    leftBorder->setObjectName("PanelSeparatorV");
+    outerLayout->addWidget(leftBorder);
+
+    auto* content = new QWidget(this);
+    outerLayout->addWidget(content, 1);
+
+    // ── Content layout ────────────────────────────────────
+    auto* layout = new QVBoxLayout(content);
+    layout->setContentsMargins(0, 0, 0, 16);
     layout->setSpacing(0);
 
-    m_orange = new EffectPanel(EffectType::Orange, this);
+    const auto makeSep = [content]() {
+        auto* sep = new QFrame(content);
+        sep->setFrameShape(QFrame::HLine);
+        sep->setObjectName("PanelSeparator");
+        return sep;
+    };
 
-    auto* sep = new QFrame(this);
-    sep->setFrameShape(QFrame::HLine);
-    sep->setObjectName("PanelSeparator");
-
-    m_green = new EffectPanel(EffectType::Green, this);
+    m_orange = new EffectPanel(EffectType::Orange, content);
+    m_green  = new EffectPanel(EffectType::Green, content);
 
     // ── Progress bar ──────────────────────────────────────
-    m_progressBar = new QProgressBar(this);
+    m_progressBar = new QProgressBar(content);
     m_progressBar->setObjectName("EffectProgress");
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
@@ -41,11 +58,13 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
         QTimer::singleShot(200, this, [this]() { m_progressBar->setValue(0); });
     });
 
-    layout->addWidget(m_orange);
+    layout->addWidget(makeSep());
     layout->addSpacing(16);
-    layout->addWidget(sep);
+    layout->addWidget(m_orange);
+    layout->addWidget(makeSep());
     layout->addSpacing(16);
     layout->addWidget(m_green);
+    layout->addWidget(makeSep());
     layout->addSpacing(16);
     layout->addWidget(m_progressBar);
     layout->addStretch();
@@ -63,7 +82,6 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     connect(m_green, &EffectPanel::enabledChanged, controller,
             &EffectsController::setGreenEnabled);
 
-    // trigger progress on any slider change
     auto trigger = [this](float) { triggerProgress(); };
     connect(m_orange, &EffectPanel::opacityChanged, this, trigger);
     connect(m_orange, &EffectPanel::thresholdChanged, this, trigger);
