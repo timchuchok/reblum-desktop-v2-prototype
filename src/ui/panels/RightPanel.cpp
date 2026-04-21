@@ -58,7 +58,6 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
         QTimer::singleShot(200, this, [this]() { m_progressBar->setValue(0); });
     });
 
-    layout->addWidget(makeSep());
     layout->addSpacing(16);
     layout->addWidget(m_orange);
     layout->addWidget(makeSep());

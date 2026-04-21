@@ -66,7 +66,7 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     headerLayout->addStretch();
     headerLayout->addWidget(m_chevron);
 
-    // ── Body (262px wide, collapsible) ────────────────────────
+    // ── Body (sliders — collapsible) ─────────────────────────
     m_body = new QWidget(this);
     auto* bodyLayout = new QVBoxLayout(m_body);
     bodyLayout->setContentsMargins(0, 8, 19, 0);
@@ -96,6 +96,8 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     bodyLayout->addWidget(m_opacitySlider);
 
     auto* thresholdValue = makeSliderRow("Threshold");
+    // Orange threshold: dark→light (highlights = bright pixels, right side)
+    // Green  threshold: light→dark (shadows  = dark  pixels, left  side)
     m_thresholdSlider = isOrange
                             ? new GradientSlider(QColor(20, 20, 20),
                                                  QColor(180, 180, 180), m_body)
@@ -106,7 +108,7 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     layout->addWidget(m_header);
     layout->addWidget(m_body);
 
-    // ── Animation ─────────────────────────────────────────────
+    // ── Animation (click outside eye button → collapse) ───────
     m_animation = new QVariantAnimation(this);
     m_animation->setDuration(200);
     m_animation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -144,6 +146,8 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
                 thresholdValue->setText(QString::number(qRound(v * 100)));
             });
 
+    // Eye button: hold to temporarily disable (compare mode), release to
+    // restore
     connect(m_eyeBtn, &QAbstractButton::pressed, this,
             [this]() { emit enabledChanged(false); });
     connect(m_eyeBtn, &QAbstractButton::released, this,
