@@ -26,7 +26,7 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     // ── Outer layout ──────────────────────────────────────────
     // Right margin = 0 so header (266px) and body (262px) set their own.
     auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(12, 0, 0, 16);
+    layout->setContentsMargins(15, 0, 0, 16);
     layout->setSpacing(0);
 
     setCursor(Qt::PointingHandCursor);
@@ -56,7 +56,7 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     // ── Body (sliders — collapsible) ─────────────────────────
     m_body = new QWidget(this);
     auto* bodyLayout = new QVBoxLayout(m_body);
-    bodyLayout->setContentsMargins(0, 8, 19, 0);
+    bodyLayout->setContentsMargins(0, 8, 15, 0);
     bodyLayout->setSpacing(6);
 
     auto makeSliderRow = [&](const QString& labelText) -> QLabel* {

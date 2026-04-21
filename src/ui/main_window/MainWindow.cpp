@@ -96,7 +96,7 @@ void MainWindow::setupUi() {
     // ── Bottom bar ────────────────────────────────────────
     auto* bottomBar = new QWidget(central);
     bottomBar->setObjectName("BottomBar");
-    bottomBar->setFixedHeight(36);
+    bottomBar->setFixedHeight(40);
 
     auto* bottomLayout = new QHBoxLayout(bottomBar);
     bottomLayout->setContentsMargins(0, 0, 0, 0);

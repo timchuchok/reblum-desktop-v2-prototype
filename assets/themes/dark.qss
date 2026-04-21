@@ -11,7 +11,7 @@ QWidget {
 
 /* ── Toolbar (unified title bar) ─────────────────────────── */
 QWidget#MainToolbar {
-    background-color: #0d0d0d;
+    background-color: #19191A;
     border-bottom: 1px solid #222222;
     spacing: 4px;
     padding: 0 12px;
@@ -51,12 +51,12 @@ QProgressBar#EffectProgress::chunk {
 
 /* ── Right panel ─────────────────────────────────────────── */
 QWidget#RightPanel {
-    background-color: #161616;
+    background-color: #19191A;
 }
 
 QFrame#PanelSeparatorV {
-    color: #2a2a2a;
-    background-color: #2a2a2a;
+    color: #282829;
+    background-color: #282829;
     border: none;
     min-width: 1px;
     max-width: 1px;
@@ -76,8 +76,8 @@ QLabel#SliderLabel {
 }
 
 QFrame#PanelSeparator {
-    color: #2a2a2a;
-    background-color: #2a2a2a;
+    color: #282829;
+    background-color: #282829;
     border: none;
     min-height: 1px;
     max-height: 1px;
@@ -85,7 +85,7 @@ QFrame#PanelSeparator {
 
 /* ── Bottom bar ──────────────────────────────────────────── */
 QWidget#BottomBar {
-    background-color: #0d0d0d;
+    background-color: #19191A;
     border-top: 1px solid #222222;
 }
 
