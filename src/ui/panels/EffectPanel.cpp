@@ -26,8 +26,8 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     // ── Outer layout ──────────────────────────────────────────
     // Right margin = 0 so header (266px) and body (262px) set their own.
     auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(15, 0, 0, 16);
-    layout->setSpacing(0);
+    layout->setContentsMargins(16, 12, 16, 16);
+    layout->setSpacing(12);
 
     setCursor(Qt::PointingHandCursor);
 
@@ -36,7 +36,7 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     m_header->installEventFilter(this);
 
     auto* headerLayout = new QHBoxLayout(m_header);
-    headerLayout->setContentsMargins(0, 0, 15, 0);
+    headerLayout->setContentsMargins(0, 0, 0, 0);
     headerLayout->setSpacing(6);
 
     m_eyeBtn = new EyeButton(m_header);
@@ -56,8 +56,8 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     // ── Body (sliders — collapsible) ─────────────────────────
     m_body = new QWidget(this);
     auto* bodyLayout = new QVBoxLayout(m_body);
-    bodyLayout->setContentsMargins(0, 8, 15, 0);
-    bodyLayout->setSpacing(6);
+    bodyLayout->setContentsMargins(0, 0, 0, 0);
+    bodyLayout->setSpacing(12);
 
     auto makeSliderRow = [&](const QString& labelText) -> QLabel* {
         auto* row = new QWidget(m_body);
@@ -79,17 +79,21 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     };
 
     auto* opacityValue = makeSliderRow("Opacity");
-    m_opacitySlider = new GradientSlider(QColor(40, 40, 40), color, m_body);
+    m_opacitySlider = isOrange
+                          ? new GradientSlider(QColor(0x81, 0x29, 0x40),
+                                               QColor(0xD7, 0x4C, 0x2E), m_body)
+                          : new GradientSlider(QColor(0x30, 0x82, 0x59),
+                                               QColor(0x1C, 0xE3, 0xB4), m_body);
     bodyLayout->addWidget(m_opacitySlider);
 
     auto* thresholdValue = makeSliderRow("Threshold");
     // Orange threshold: dark→light (highlights = bright pixels, right side)
     // Green  threshold: light→dark (shadows  = dark  pixels, left  side)
     m_thresholdSlider = isOrange
-                            ? new GradientSlider(QColor(20, 20, 20),
-                                                 QColor(180, 180, 180), m_body)
-                            : new GradientSlider(QColor(180, 180, 180),
-                                                 QColor(20, 20, 20), m_body);
+                            ? new GradientSlider(QColor(0x36, 0x36, 0x36),
+                                                 QColor(0xB5, 0xB5, 0xB5), m_body)
+                            : new GradientSlider(QColor(0xC1, 0xC1, 0xC1),
+                                                 QColor(0x3B, 0x3B, 0x3B), m_body);
     bodyLayout->addWidget(m_thresholdSlider);
 
     layout->addWidget(m_header);
@@ -107,16 +111,17 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
             m_body->setMinimumHeight(bodyH);
             m_body->setMaximumHeight(bodyH);
             const QMargins cm = this->layout()->contentsMargins();
-            setFixedHeight(m_header->height() + bodyH + cm.top() + cm.bottom());
+            const int sp = bodyH > 0 ? this->layout()->spacing() : 0;
+            setFixedHeight(m_header->height() + sp + bodyH + cm.top() + cm.bottom());
         });
 
     connect(m_animation, &QVariantAnimation::finished, this, [this]() {
         if (!m_collapsed) {
             m_body->setMinimumHeight(0);
             m_body->setMaximumHeight(QWIDGETSIZE_MAX);
+            setMinimumHeight(0);
+            setMaximumHeight(QWIDGETSIZE_MAX);
         }
-        setMinimumHeight(0);
-        setMaximumHeight(QWIDGETSIZE_MAX);
     });
 
     connect(m_opacitySlider, &GradientSlider::valueChanged, this,

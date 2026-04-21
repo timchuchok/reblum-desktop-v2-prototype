@@ -28,7 +28,7 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
 
     // ── Content layout ────────────────────────────────────
     auto* layout = new QVBoxLayout(content);
-    layout->setContentsMargins(0, 0, 0, 16);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     const auto makeSep = [content]() {
@@ -39,7 +39,7 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     };
 
     m_orange = new EffectPanel(EffectType::Orange, content);
-    m_green  = new EffectPanel(EffectType::Green, content);
+    m_green = new EffectPanel(EffectType::Green, content);
 
     // ── Progress bar ──────────────────────────────────────
     m_progressBar = new QProgressBar(content);
@@ -58,15 +58,18 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
         QTimer::singleShot(200, this, [this]() { m_progressBar->setValue(0); });
     });
 
-    layout->addSpacing(16);
+    auto* progressContainer = new QWidget(content);
+    auto* progressLayout = new QHBoxLayout(progressContainer);
+    progressLayout->setContentsMargins(12, 0, 12, 12);
+    progressLayout->setSpacing(0);
+    progressLayout->addWidget(m_progressBar);
+
     layout->addWidget(m_orange);
     layout->addWidget(makeSep());
-    layout->addSpacing(16);
     layout->addWidget(m_green);
     layout->addWidget(makeSep());
-    layout->addSpacing(16);
-    layout->addWidget(m_progressBar);
     layout->addStretch();
+    layout->addWidget(progressContainer);
 
     connect(m_orange, &EffectPanel::opacityChanged, controller,
             &EffectsController::setOrangeOpacity);
