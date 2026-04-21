@@ -39,8 +39,7 @@ private:
     bool m_collapsed = false;
     bool m_headerHovered = false;
 
-    QPixmap m_pixRightNormal;
+    QPixmap m_pixRight;
     QPixmap m_pixRightHover;
-    QPixmap m_pixUpNormal;
-    QPixmap m_pixUpHover;
+    QPixmap m_pixUp;
 };

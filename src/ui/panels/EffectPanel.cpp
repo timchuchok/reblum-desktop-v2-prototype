@@ -3,26 +3,13 @@
 #include <QEasingCurve>
 #include <QEvent>
 #include <QHBoxLayout>
-#include <QImage>
+#include <QIcon>
 #include <QLabel>
 #include <QMouseEvent>
-#include <QPainter>
-#include <QSvgRenderer>
 #include <QVBoxLayout>
 
 #include "ui/widgets/EyeButton.h"
 #include "ui/widgets/GradientSlider.h"
-
-static QPixmap colorize(const QString& path, const QColor& color) {
-    QSvgRenderer renderer(path);
-    QImage img(20, 20, QImage::Format_ARGB32_Premultiplied);
-    img.fill(Qt::transparent);
-    QPainter p(&img);
-    renderer.render(&p);
-    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    p.fillRect(img.rect(), color);
-    return QPixmap::fromImage(img);
-}
 
 EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
     const bool isOrange = (type == EffectType::Orange);
@@ -30,11 +17,11 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
         isOrange ? QColor(0xc8, 0x62, 0x2a) : QColor(0x3a, 0x8a, 0x50);
     const QString name = isOrange ? "Orange" : "Green";
 
-    // Precompute chevron pixmaps
-    m_pixRightNormal = colorize(":/icons/caret-right.svg", QColor("#747477"));
-    m_pixRightHover  = colorize(":/icons/caret-right.svg", QColor("#CACACA"));
-    m_pixUpNormal    = colorize(":/icons/caret-up.svg",    QColor("#747477"));
-    m_pixUpHover     = colorize(":/icons/caret-up.svg",    QColor("#CACACA"));
+    // Precompute chevron pixmaps — QIcon handles DPR automatically
+    const QSize iconSz(20, 20);
+    m_pixRight      = QIcon(":/icons/caret-right.svg").pixmap(iconSz);
+    m_pixRightHover = QIcon(":/icons/caret-right-hovered.svg").pixmap(iconSz);
+    m_pixUp         = QIcon(":/icons/caret-up.svg").pixmap(iconSz);
 
     // ── Outer layout ──────────────────────────────────────────
     // Right margin = 0 so header (266px) and body (262px) set their own.
@@ -172,9 +159,9 @@ bool EffectPanel::eventFilter(QObject* obj, QEvent* event) {
 
 void EffectPanel::updateChevron() {
     if (m_collapsed) {
-        m_chevron->setPixmap(m_headerHovered ? m_pixRightHover : m_pixRightNormal);
+        m_chevron->setPixmap(m_headerHovered ? m_pixRightHover : m_pixRight);
     } else {
-        m_chevron->setPixmap(m_headerHovered ? m_pixUpHover : m_pixUpNormal);
+        m_chevron->setPixmap(m_pixUp);
     }
 }
 
