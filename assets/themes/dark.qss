@@ -111,15 +111,26 @@ QFrame#PanelSeparatorV {
 }
 
 QLabel#EffectName {
-    color: #cccccc;
-    font-size: 12px;
-    font-weight: 600;
+    color: #98989B;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
     background: transparent;
 }
 
-QLabel#SliderLabel {
-    color: #666666;
+QLabel#SliderHeaderText {
+    color: #747477;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    background: transparent;
+}
+
+QLabel#SliderValueText {
+    color: #98989B;
     font-size: 10px;
+    font-weight: 400;
+    line-height: 12px;
     background: transparent;
 }
 
@@ -144,20 +155,17 @@ QWidget#BottomRightSection {
 QPushButton#ZoomFit,
 QPushButton#Zoom100 {
     background-color: transparent;
-    color: #777777;
+    color: #98989B;
     border: none;
-    font-size: 11px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
     padding: 2px 8px;
 }
 
 QPushButton#ZoomFit:hover,
 QPushButton#Zoom100:hover {
-    color: #cccccc;
-}
-
-QPushButton#ZoomFit:checked,
-QPushButton#Zoom100:checked {
-    color: #ffffff;
+    color: #E5E5E5;
 }
 
 QPushButton#ExportButton {

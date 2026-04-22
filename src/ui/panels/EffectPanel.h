@@ -34,6 +34,7 @@ private:
     EyeButton* m_eyeBtn = nullptr;
     QWidget* m_header = nullptr;
     QWidget* m_body = nullptr;
+    QLabel* m_nameLabel = nullptr;
     QLabel* m_chevron = nullptr;
     QVariantAnimation* m_animation = nullptr;
     bool m_collapsed = false;

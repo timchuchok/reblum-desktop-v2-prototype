@@ -19,6 +19,29 @@
 #include <QWidget>
 #include <QWindow>
 
+#include "ui/utils/SvgIcon.h"
+
+class HoverIconFilter : public QObject {
+public:
+    HoverIconFilter(QPushButton* btn, const QString& path, QSize iconSz,
+                    QColor normal, QColor hover)
+        : QObject(btn), m_btn(btn),
+          m_normal(svgIcon(path, iconSz, normal)),
+          m_hover(svgIcon(path, iconSz, hover)) {
+        btn->setIcon(m_normal);
+        btn->installEventFilter(this);
+    }
+protected:
+    bool eventFilter(QObject*, QEvent* e) override {
+        if (e->type() == QEvent::Enter) m_btn->setIcon(m_hover);
+        else if (e->type() == QEvent::Leave) m_btn->setIcon(m_normal);
+        return false;
+    }
+private:
+    QPushButton* m_btn;
+    QIcon m_normal, m_hover;
+};
+
 #include "app/Application.h"
 #include "app/ThemeManager.h"
 #include "ui/panels/RightPanel.h"
@@ -96,19 +119,22 @@ void MainWindow::setupUi() {
 
     topLayout->addWidget(m_metaBadge, 0, Qt::AlignVCenter);
     topLayout->addWidget(m_fileLabel, 0, Qt::AlignVCenter);
+    static const QColor kIconNormal(0x74, 0x74, 0x77);
+    static const QColor kIconHover(0xC9, 0xC9, 0xC9);
+
     auto* userBtn = new QPushButton(m_topBar);
     userBtn->setObjectName("ToolbarIconBtn");
-    userBtn->setIcon(QIcon(":/icons/user.svg"));
     userBtn->setIconSize(QSize(22, 22));
     userBtn->setFixedSize(28, 28);
     userBtn->setFlat(true);
+    new HoverIconFilter(userBtn, ":/icons/user.svg", {22, 22}, kIconNormal, kIconHover);
 
     auto* infoBtn = new QPushButton(m_topBar);
     infoBtn->setObjectName("ToolbarInfoBtn");
-    infoBtn->setIcon(QIcon(":/icons/info.svg"));
     infoBtn->setIconSize(QSize(15, 15));
     infoBtn->setFixedSize(28, 28);
     infoBtn->setFlat(true);
+    new HoverIconFilter(infoBtn, ":/icons/info.svg", {15, 15}, kIconNormal, kIconHover);
 
     topLayout->addWidget(midSpacer);
     topLayout->addWidget(trialBadge, 0, Qt::AlignVCenter);

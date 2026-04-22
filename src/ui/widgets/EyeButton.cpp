@@ -1,36 +1,40 @@
 #include "EyeButton.h"
 
-#include <QImage>
+#include <QApplication>
 #include <QPainter>
-#include <QSvgRenderer>
+#include <QScreen>
 
-static QPixmap renderSvgTinted(const QString& path, QSize size, QColor tint) {
-    QSvgRenderer renderer(path);
-    QImage image(size, QImage::Format_ARGB32_Premultiplied);
-    image.fill(Qt::transparent);
-
-    QPainter rp(&image);
-    renderer.render(&rp);
-    rp.end();
-
-    // Replace icon color with tint, preserving alpha
-    QPainter tp(&image);
-    tp.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    tp.fillRect(image.rect(), tint);
-    tp.end();
-
-    return QPixmap::fromImage(image);
-}
+#include "ui/utils/SvgIcon.h"
 
 EyeButton::EyeButton(QWidget* parent) : QAbstractButton(parent) {
     setCursor(Qt::PointingHandCursor);
-    setFixedSize(20, 20);
+    setFixedSize(28, 28);
 
-    m_icon = renderSvgTinted(":/icons/eye-show.svg", QSize(20, 20),
-                             QColor(210, 210, 210));
+    const qreal dpr = qApp->primaryScreen()->devicePixelRatio();
+    m_icon = svgTinted(":/icons/eye-show.svg", {20, 20},
+                       QColor(0x74, 0x74, 0x77), dpr);
+    m_iconHover = svgTinted(":/icons/eye-show.svg", {20, 20},
+                            QColor(0xC9, 0xC9, 0xC9), dpr);
 }
 
 void EyeButton::paintEvent(QPaintEvent*) {
     QPainter p(this);
-    p.drawPixmap(0, 0, m_icon);
+    if (m_hovered) {
+        p.setRenderHint(QPainter::Antialiasing);
+        p.setPen(Qt::NoPen);
+        p.setBrush(QColor(255, 255, 255, 38));
+        p.drawRoundedRect(rect(), 4, 4);
+    }
+    // Centre the 20×20 icon inside the 28×28 widget
+    p.drawPixmap(4, 4, m_hovered ? m_iconHover : m_icon);
+}
+
+void EyeButton::enterEvent(QEnterEvent*) {
+    m_hovered = true;
+    update();
+}
+
+void EyeButton::leaveEvent(QEvent*) {
+    m_hovered = false;
+    update();
 }
