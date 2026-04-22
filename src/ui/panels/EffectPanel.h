@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QPixmap>
+#include <QIcon>
 #include <QVariantAnimation>
 #include <QWidget>
 
@@ -40,7 +40,7 @@ private:
     bool m_collapsed = false;
     bool m_headerHovered = false;
 
-    QPixmap m_pixRight;
-    QPixmap m_pixRightHover;
-    QPixmap m_pixUp;
+    QIcon m_iconRight;
+    QIcon m_iconRightHover;
+    QIcon m_iconUp;
 };

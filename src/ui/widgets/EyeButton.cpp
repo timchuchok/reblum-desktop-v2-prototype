@@ -1,8 +1,6 @@
 #include "EyeButton.h"
 
-#include <QApplication>
 #include <QPainter>
-#include <QScreen>
 
 #include "ui/utils/SvgIcon.h"
 
@@ -10,11 +8,8 @@ EyeButton::EyeButton(QWidget* parent) : QAbstractButton(parent) {
     setCursor(Qt::PointingHandCursor);
     setFixedSize(28, 28);
 
-    const qreal dpr = qApp->primaryScreen()->devicePixelRatio();
-    m_icon = svgTinted(":/icons/eye-show.svg", {20, 20},
-                       QColor(0x74, 0x74, 0x77), dpr);
-    m_iconHover = svgTinted(":/icons/eye-show.svg", {20, 20},
-                            QColor(0xC9, 0xC9, 0xC9), dpr);
+    m_icon = svgIcon(":/icons/eye-show.svg", {20, 20}, QColor(0x74, 0x74, 0x77));
+    m_iconHover = svgIcon(":/icons/eye-show.svg", {20, 20}, QColor(0xC9, 0xC9, 0xC9));
 }
 
 void EyeButton::paintEvent(QPaintEvent*) {
@@ -26,7 +21,7 @@ void EyeButton::paintEvent(QPaintEvent*) {
         p.drawRoundedRect(rect(), 4, 4);
     }
     // Centre the 20×20 icon inside the 28×28 widget
-    p.drawPixmap(4, 4, m_hovered ? m_iconHover : m_icon);
+    p.drawPixmap(4, 4, (m_hovered ? m_iconHover : m_icon).pixmap({20, 20}));
 }
 
 void EyeButton::enterEvent(QEnterEvent*) {

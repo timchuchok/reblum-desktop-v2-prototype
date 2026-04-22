@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QAbstractButton>
-#include <QPixmap>
+#include <QIcon>
 
 class EyeButton : public QAbstractButton {
     Q_OBJECT
@@ -15,8 +15,8 @@ protected:
     void leaveEvent(QEvent*) override;
 
 private:
-    QPixmap m_icon;
-    QPixmap m_iconHover;
+    QIcon m_icon;
+    QIcon m_iconHover;
     bool m_hovered = false;
 
 };

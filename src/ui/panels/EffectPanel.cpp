@@ -1,6 +1,5 @@
 #include "EffectPanel.h"
 
-#include <QApplication>
 #include <QEasingCurve>
 #include <QEvent>
 #include <QHBoxLayout>
@@ -75,15 +74,12 @@ EffectPanel::EffectPanel(EffectType type, QWidget* parent) : QWidget(parent) {
         isOrange ? QColor(0xc8, 0x62, 0x2a) : QColor(0x3a, 0x8a, 0x50);
     const QString name = isOrange ? "Orange" : "Green";
 
-    // Precompute chevron pixmaps with tinting for correct DPR on all screens
     const QSize iconSz(20, 20);
-    const qreal dpr = qApp->primaryScreen()->devicePixelRatio();
     static const QColor kNormal(0x74, 0x74, 0x77);
     static const QColor kActive(0xC9, 0xC9, 0xC9);
-    m_pixRight = svgTinted(":/icons/caret-right.svg", iconSz, kNormal, dpr);
-    m_pixRightHover =
-        svgTinted(":/icons/caret-right.svg", iconSz, kActive, dpr);
-    m_pixUp = svgTinted(":/icons/caret-up.svg", iconSz, kActive, dpr);
+    m_iconRight = svgIcon(":/icons/caret-right.svg", iconSz, kNormal);
+    m_iconRightHover = svgIcon(":/icons/caret-right.svg", iconSz, kActive);
+    m_iconUp = svgIcon(":/icons/caret-up.svg", iconSz, kActive);
 
     // ── Outer layout ──────────────────────────────────────────
     // Right margin = 0 so header (266px) and body (262px) set their own.
@@ -228,10 +224,12 @@ bool EffectPanel::eventFilter(QObject* obj, QEvent* event) {
 }
 
 void EffectPanel::updateChevron() {
+    const QSize iconSz(20, 20);
     if (m_collapsed) {
-        m_chevron->setPixmap(m_headerHovered ? m_pixRightHover : m_pixRight);
+        m_chevron->setPixmap(
+            (m_headerHovered ? m_iconRightHover : m_iconRight).pixmap(iconSz));
     } else {
-        m_chevron->setPixmap(m_pixUp);
+        m_chevron->setPixmap(m_iconUp.pixmap(iconSz));
     }
     const bool bright = !m_collapsed || m_headerHovered;
     m_nameLabel->setStyleSheet(bright ? "color: #E5E5E5;" : "color: #98989B;");
