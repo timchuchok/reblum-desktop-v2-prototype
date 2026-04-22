@@ -7,7 +7,7 @@
 #include <QSvgRenderer>
 
 static constexpr int kHandleR = 7;  // half of 14 px thumb
-static constexpr int kTrackH = 4;
+static constexpr int kTrackH = 2;
 
 static QPixmap loadThumb(const QString& path) {
     QSvgRenderer r(path);
@@ -66,7 +66,7 @@ void GradientSlider::paintEvent(QPaintEvent*) {
 
     // ── Filled portion (0 → value) ────────────────────────────
     if (m_value > 0.0f) {
-        QLinearGradient grad(trackLeft, 0, trackRight, 0);
+        QLinearGradient grad(trackLeft, 0, fillRight, 0);
         grad.setColorAt(0.0, m_fromColor);
         grad.setColorAt(1.0, m_toColor);
 

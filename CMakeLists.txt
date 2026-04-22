@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(reblum VERSION 2.0 LANGUAGES CXX)
+project(reblum VERSION 2.0 LANGUAGES CXX OBJCXX)
 
 set(APP_NAME        "Reblum")
 set(APP_ORG         "Reblum")
@@ -81,4 +81,6 @@ if(APPLE)
     set_target_properties(reblum PROPERTIES
         MACOSX_BUNDLE TRUE
     )
+    target_sources(reblum PRIVATE src/platform/MacOSHelper.mm)
+    target_link_libraries(reblum PRIVATE "-framework AppKit")
 endif()

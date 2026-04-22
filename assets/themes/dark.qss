@@ -10,32 +10,70 @@ QWidget {
 }
 
 /* ── Toolbar (unified title bar) ─────────────────────────── */
+QMainWindow {
+    background-color: #19191A;
+}
+
 QWidget#MainToolbar {
-    background-color: #0d0d0d;
-    border-bottom: 1px solid #222222;
+    background-color: #19191A;
     spacing: 4px;
     padding: 0 12px;
 }
 
-QLabel#ImageMeta {
-    color: #888888;
-    font-size: 11px;
+QWidget#MainToolbar QWidget {
+    background: transparent;
+}
+
+QWidget#MainToolbar QWidget#ImageMetaBadge {
+    background: #111111;
+    border-radius: 8px;
+}
+
+QWidget#MainToolbar QLabel#ImageMeta {
+    color: #98989B;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
 }
 
 QLabel#FileName {
-    color: #cccccc;
-    font-size: 11px;
+    color: #747477;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    background: transparent;
 }
 
-QLabel#TrialBadge {
+QPushButton#ToolbarIconBtn,
+QPushButton#ToolbarInfoBtn {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+QPushButton#ToolbarIconBtn:hover,
+QPushButton#ToolbarInfoBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+QPushButton#ToolbarInfoBtn {
+    padding-top: 1px;
+    padding-bottom: 0;
+}
+
+QWidget#MainToolbar QWidget#TrialBadge {
+    background: #221C2F;
+    border: 1px solid #282F59;
+    border-radius: 4px;
+}
+
+QLabel#TrialBadgeText {
     color: #8FC4FF;
     font-size: 12px;
     font-weight: 500;
     line-height: 16px;
-    letter-spacing: 0px;
-    padding: 2px 8px;
-    border: 1px solid #333333;
-border-radius: 3px;
+    background: transparent;
 }
 
 /* ── Effect progress bar ─────────────────────────────────── */
@@ -45,59 +83,89 @@ QProgressBar#EffectProgress {
     max-height: 3px;
 }
 QProgressBar#EffectProgress::chunk {
-    background-color: #c8622a;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #4d1020, stop:1 #c8622a);
     border-radius: 0px;
 }
 
 /* ── Right panel ─────────────────────────────────────────── */
 QWidget#RightPanel {
-    background-color: #161616;
-    border-left: 1px solid #222222;
+    background-color: #19191A;
 }
 
-QLabel#EffectName {
-    color: #cccccc;
-    font-size: 12px;
-    font-weight: 600;
+EffectPanel,
+EffectPanel QWidget {
     background: transparent;
 }
 
-QLabel#SliderLabel {
-    color: #666666;
+QWidget#ProgressContainer {
+    background: transparent;
+}
+
+QFrame#PanelSeparatorV {
+    color: #282829;
+    background-color: #282829;
+    border: none;
+    min-width: 1px;
+    max-width: 1px;
+}
+
+QLabel#EffectName {
+    color: #98989B;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    background: transparent;
+}
+
+QLabel#SliderHeaderText {
+    color: #747477;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    background: transparent;
+}
+
+QLabel#SliderValueText {
+    color: #98989B;
     font-size: 10px;
+    font-weight: 400;
+    line-height: 12px;
     background: transparent;
 }
 
 QFrame#PanelSeparator {
-    color: #2a2a2a;
-    background-color: #2a2a2a;
+    color: #282829;
+    background-color: #282829;
     border: none;
+    min-height: 1px;
     max-height: 1px;
 }
 
 /* ── Bottom bar ──────────────────────────────────────────── */
 QWidget#BottomBar {
-    background-color: #0d0d0d;
-    border-top: 1px solid #222222;
+    background-color: #19191A;
+}
+
+QWidget#BottomImageSection,
+QWidget#BottomRightSection {
+    background: transparent;
 }
 
 QPushButton#ZoomFit,
 QPushButton#Zoom100 {
     background-color: transparent;
-    color: #777777;
+    color: #98989B;
     border: none;
-    font-size: 11px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
     padding: 2px 8px;
 }
 
 QPushButton#ZoomFit:hover,
 QPushButton#Zoom100:hover {
-    color: #cccccc;
-}
-
-QPushButton#ZoomFit:checked,
-QPushButton#Zoom100:checked {
-    color: #ffffff;
+    color: #E5E5E5;
 }
 
 QPushButton#ExportButton {
