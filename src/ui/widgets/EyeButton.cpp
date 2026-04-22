@@ -8,8 +8,10 @@ EyeButton::EyeButton(QWidget* parent) : QAbstractButton(parent) {
     setCursor(Qt::PointingHandCursor);
     setFixedSize(28, 28);
 
-    m_icon = svgIcon(":/icons/eye-show.svg", {20, 20}, QColor(0x74, 0x74, 0x77));
-    m_iconHover = svgIcon(":/icons/eye-show.svg", {20, 20}, QColor(0xC9, 0xC9, 0xC9));
+    m_icon =
+        svgIcon(":/icons/eye-show.svg", {20, 20}, QColor(0x74, 0x74, 0x77));
+    m_iconHover =
+        svgIcon(":/icons/eye-show.svg", {20, 20}, QColor(0xC9, 0xC9, 0xC9));
 }
 
 void EyeButton::paintEvent(QPaintEvent*) {

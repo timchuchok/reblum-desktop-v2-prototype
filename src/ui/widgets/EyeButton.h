@@ -18,5 +18,4 @@ private:
     QIcon m_icon;
     QIcon m_iconHover;
     bool m_hovered = false;
-
 };

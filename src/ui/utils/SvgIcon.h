@@ -9,7 +9,8 @@
 
 // Renders an SVG at the given logical size, replaces all opaque pixels
 // with `color`, and tags the pixmap with the given device-pixel ratio.
-inline QPixmap svgTinted(const QString& path, QSize size, QColor color, qreal dpr) {
+inline QPixmap svgTinted(const QString& path, QSize size, QColor color,
+                         qreal dpr) {
     const QSize physical = size * dpr;
     QImage img(physical, QImage::Format_ARGB32_Premultiplied);
     img.fill(Qt::transparent);
@@ -32,7 +33,8 @@ inline QPixmap svgTinted(const QString& path, QSize size, QColor color, qreal dp
 // resolution automatically on any screen.
 inline QIcon svgIcon(const QString& path, QSize size, QColor color) {
     QIcon icon;
-    for (qreal dpr : {1.0, 2.0, 3.0})
+    for (qreal dpr : {1.0, 2.0, 3.0}) {
         icon.addPixmap(svgTinted(path, size, color, dpr));
+    }
     return icon;
 }
