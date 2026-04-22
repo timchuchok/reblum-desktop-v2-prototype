@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QSizeGrip>
+#include <QStyle>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QWindow>
@@ -57,8 +58,17 @@ void MainWindow::setupUi() {
     topLayout->setContentsMargins(80, 0, 12, 0);
     topLayout->setSpacing(4);
 
-    m_metaLabel = new QLabel("", m_topBar);
+    m_metaBadge = new QWidget(m_topBar);
+    m_metaBadge->setObjectName("ImageMetaBadge");
+    m_metaBadge->setFixedHeight(24);
+    m_metaBadge->hide();
+    auto* badgeLayout = new QHBoxLayout(m_metaBadge);
+    badgeLayout->setContentsMargins(10, 0, 10, 0);
+    badgeLayout->setSpacing(0);
+
+    m_metaLabel = new QLabel("", m_metaBadge);
     m_metaLabel->setObjectName("ImageMeta");
+    badgeLayout->addWidget(m_metaLabel);
 
     m_fileLabel = new QLabel("", m_topBar);
     m_fileLabel->setObjectName("FileName");
@@ -66,13 +76,45 @@ void MainWindow::setupUi() {
     auto* midSpacer = new QWidget(m_topBar);
     midSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    auto* trialLabel = new QLabel("Free trial — 3 days left", m_topBar);
-    trialLabel->setObjectName("TrialBadge");
+    auto* trialBadge = new QWidget(m_topBar);
+    trialBadge->setObjectName("TrialBadge");
+    trialBadge->setFixedHeight(24);
+    auto* trialLayout = new QHBoxLayout(trialBadge);
+    trialLayout->setContentsMargins(8, 0, 8, 0);
+    trialLayout->setSpacing(6);
 
-    topLayout->addWidget(m_metaLabel);
-    topLayout->addWidget(m_fileLabel);
+    auto* giftIcon = new QLabel(trialBadge);
+    giftIcon->setPixmap(QIcon(":/icons/gift.svg").pixmap(12, 12));
+    giftIcon->setFixedSize(12, 12);
+    giftIcon->setAlignment(Qt::AlignCenter);
+
+    auto* trialLabel = new QLabel("Free trial — 3 days left", trialBadge);
+    trialLabel->setObjectName("TrialBadgeText");
+
+    trialLayout->addWidget(giftIcon);
+    trialLayout->addWidget(trialLabel);
+
+    topLayout->addWidget(m_metaBadge, 0, Qt::AlignVCenter);
+    topLayout->addWidget(m_fileLabel, 0, Qt::AlignVCenter);
+    auto* userBtn = new QPushButton(m_topBar);
+    userBtn->setObjectName("ToolbarIconBtn");
+    userBtn->setIcon(QIcon(":/icons/user.svg"));
+    userBtn->setIconSize(QSize(22, 22));
+    userBtn->setFixedSize(28, 28);
+    userBtn->setFlat(true);
+
+    auto* infoBtn = new QPushButton(m_topBar);
+    infoBtn->setObjectName("ToolbarInfoBtn");
+    infoBtn->setIcon(QIcon(":/icons/info.svg"));
+    infoBtn->setIconSize(QSize(15, 15));
+    infoBtn->setFixedSize(28, 28);
+    infoBtn->setFlat(true);
+
     topLayout->addWidget(midSpacer);
-    topLayout->addWidget(trialLabel);
+    topLayout->addWidget(trialBadge, 0, Qt::AlignVCenter);
+    topLayout->addWidget(userBtn, 0, Qt::AlignVCenter);
+    topLayout->addSpacing(5);
+    topLayout->addWidget(infoBtn, 0, Qt::AlignVCenter);
 
     // Install event filter for window drag on topBar and all its children
     m_topBar->installEventFilter(this);
@@ -83,7 +125,7 @@ void MainWindow::setupUi() {
     root->addWidget(m_topBar);
     auto makeSep = [central]() -> QFrame* {
         auto* sep = new QFrame(central);
-        sep->setFrameShape(QFrame::HLine);
+        sep->setFrameShape(QFrame::NoFrame);
         sep->setObjectName("PanelSeparator");
         return sep;
     };
@@ -114,6 +156,7 @@ void MainWindow::setupUi() {
 
     // Image section: Fit / 100% aligned to the right edge of the canvas
     auto* imageSection = new QWidget(bottomBar);
+    imageSection->setObjectName("BottomImageSection");
     auto* imageSectionLayout = new QHBoxLayout(imageSection);
     imageSectionLayout->setContentsMargins(12, 0, 12, 0);
     imageSectionLayout->setSpacing(4);
@@ -145,6 +188,7 @@ void MainWindow::setupUi() {
 
     // Right panel section: Export button, matches right panel width
     auto* rightSection = new QWidget(bottomBar);
+    rightSection->setObjectName("BottomRightSection");
     rightSection->setFixedWidth(293);
     auto* rightSectionLayout = new QHBoxLayout(rightSection);
     rightSectionLayout->setContentsMargins(12, 6, 12, 6);
@@ -157,7 +201,7 @@ void MainWindow::setupUi() {
     rightSectionLayout->addWidget(exportBtn);
 
     auto* bottomVSep = new QFrame(bottomBar);
-    bottomVSep->setFrameShape(QFrame::VLine);
+    bottomVSep->setFrameShape(QFrame::NoFrame);
     bottomVSep->setObjectName("PanelSeparatorV");
 
     bottomLayout->addWidget(imageSection, 1);
@@ -202,7 +246,10 @@ void MainWindow::showEvent(QShowEvent* event) {
 #ifdef Q_OS_MACOS
     auto* tm = static_cast<Application*>(qApp)->themeManager();
     const bool dark = tm->current() == ThemeManager::Theme::Dark;
-    MacOSHelper::setupFullSizeTitleBar(winId(), dark);
+    if (!m_titleBarConfigured) {
+        m_titleBarConfigured = true;
+        MacOSHelper::setupFullSizeTitleBar(winId(), dark);
+    }
     MacOSHelper::setWindowBackground(winId(), dark);
 #endif
 }
@@ -285,7 +332,8 @@ void MainWindow::openImage() {
 void MainWindow::onImageLoaded(const ImageModel& model) {
     m_imageView->setImage(model);
     m_fileLabel->setText("  " + model.fileName);
-    m_metaLabel->setText(QString("%1 × %2 px  ")
+    m_metaLabel->setText(QString("%1 × %2 px")
                              .arg(model.size().width())
                              .arg(model.size().height()));
+    m_metaBadge->show();
 }

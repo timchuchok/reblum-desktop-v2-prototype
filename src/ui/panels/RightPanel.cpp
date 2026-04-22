@@ -10,7 +10,6 @@
 
 RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     : QWidget(parent) {
-    setObjectName("RightPanel");
     setFixedWidth(294);
 
     // ── Outer: vertical separator + content ──────────────
@@ -19,11 +18,12 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     outerLayout->setSpacing(0);
 
     auto* leftBorder = new QFrame(this);
-    leftBorder->setFrameShape(QFrame::VLine);
+    leftBorder->setFrameShape(QFrame::NoFrame);
     leftBorder->setObjectName("PanelSeparatorV");
     outerLayout->addWidget(leftBorder);
 
     auto* content = new QWidget(this);
+    content->setObjectName("RightPanel");
     outerLayout->addWidget(content, 1);
 
     // ── Content layout ────────────────────────────────────
@@ -33,7 +33,7 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
 
     const auto makeSep = [content]() {
         auto* sep = new QFrame(content);
-        sep->setFrameShape(QFrame::HLine);
+        sep->setFrameShape(QFrame::NoFrame);
         sep->setObjectName("PanelSeparator");
         return sep;
     };
@@ -59,6 +59,7 @@ RightPanel::RightPanel(EffectsController* controller, QWidget* parent)
     });
 
     auto* progressContainer = new QWidget(content);
+    progressContainer->setObjectName("ProgressContainer");
     auto* progressLayout = new QHBoxLayout(progressContainer);
     progressLayout->setContentsMargins(12, 0, 12, 12);
     progressLayout->setSpacing(0);

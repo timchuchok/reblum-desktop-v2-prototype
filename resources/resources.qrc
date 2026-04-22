@@ -9,5 +9,8 @@
         <file alias="icons/caret-right.svg">../assets/icons/caret-right.svg</file>
         <file alias="icons/caret-right-hovered.svg">../assets/icons/caret-right-hovered.svg</file>
         <file alias="icons/caret-up.svg">../assets/icons/caret-up.svg</file>
+        <file alias="icons/gift.svg">../assets/icons/gift.svg</file>
+        <file alias="icons/info.svg">../assets/icons/info.svg</file>
+        <file alias="icons/user.svg">../assets/icons/user.svg</file>
     </qresource>
 </RCC>

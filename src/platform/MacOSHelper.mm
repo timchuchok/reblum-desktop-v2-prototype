@@ -1,6 +1,7 @@
 #include "MacOSHelper.h"
 #import <AppKit/AppKit.h>
 #import <QuartzCore/QuartzCore.h>
+#include <functional>
 
 namespace MacOSHelper {
 
@@ -12,8 +13,6 @@ void setWindowBackground(quintptr winId, bool dark) {
         ? [NSColor colorWithRed:25.0/255 green:25.0/255 blue:26.0/255 alpha:1.0]
         : [NSColor whiteColor];
     window.backgroundColor = color;
-    window.contentView.wantsLayer = YES;
-    window.contentView.layer.backgroundColor = color.CGColor;
 }
 
 void setViewBackground(quintptr viewId, bool dark) {
@@ -42,8 +41,9 @@ void setupFullSizeTitleBar(quintptr winId, bool dark) {
         : NSAppearanceNameAqua;
     window.appearance = [NSAppearance appearanceNamed:appearanceName];
 
-    // Defer repositioning to after AppKit's own layout pass
+    // Defer to after AppKit's own layout pass
     dispatch_async(dispatch_get_main_queue(), ^{
+        // Reposition traffic lights to center in our 36px topBar
         NSWindowButton types[3] = {
             NSWindowCloseButton,
             NSWindowMiniaturizeButton,
