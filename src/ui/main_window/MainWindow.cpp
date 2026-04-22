@@ -4,15 +4,19 @@
 #include <QApplication>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QEvent>
 #include <QFileDialog>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QMenuBar>
 #include <QMimeData>
+#include <QMouseEvent>
 #include <QPushButton>
+#include <QSizeGrip>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QWindow>
 
 #include "app/Application.h"
 #include "app/ThemeManager.h"
@@ -44,25 +48,25 @@ void MainWindow::setupUi() {
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
 
-    // ── Top bar ────────────────────────────────────────────
-    auto* topBar = new QWidget(central);
-    topBar->setObjectName("MainToolbar");
-    topBar->setFixedHeight(38);
+    // ── Top bar (custom title bar) ─────────────────────────
+    m_topBar = new QWidget(central);
+    m_topBar->setObjectName("MainToolbar");
+    m_topBar->setFixedHeight(36);
 
-    auto* topLayout = new QHBoxLayout(topBar);
-    topLayout->setContentsMargins(12, 0, 12, 0);
+    auto* topLayout = new QHBoxLayout(m_topBar);
+    topLayout->setContentsMargins(80, 0, 12, 0);
     topLayout->setSpacing(4);
 
-    m_metaLabel = new QLabel("", topBar);
+    m_metaLabel = new QLabel("", m_topBar);
     m_metaLabel->setObjectName("ImageMeta");
 
-    m_fileLabel = new QLabel("", topBar);
+    m_fileLabel = new QLabel("", m_topBar);
     m_fileLabel->setObjectName("FileName");
 
-    auto* midSpacer = new QWidget(topBar);
+    auto* midSpacer = new QWidget(m_topBar);
     midSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    auto* trialLabel = new QLabel("Free trial — 3 days left", topBar);
+    auto* trialLabel = new QLabel("Free trial — 3 days left", m_topBar);
     trialLabel->setObjectName("TrialBadge");
 
     topLayout->addWidget(m_metaLabel);
@@ -70,7 +74,13 @@ void MainWindow::setupUi() {
     topLayout->addWidget(midSpacer);
     topLayout->addWidget(trialLabel);
 
-    root->addWidget(topBar);
+    // Install event filter for window drag on topBar and all its children
+    m_topBar->installEventFilter(this);
+    for (auto* child : m_topBar->findChildren<QWidget*>()) {
+        child->installEventFilter(this);
+    }
+
+    root->addWidget(m_topBar);
     auto makeSep = [central]() -> QFrame* {
         auto* sep = new QFrame(central);
         sep->setFrameShape(QFrame::HLine);
@@ -191,8 +201,27 @@ void MainWindow::showEvent(QShowEvent* event) {
     QMainWindow::showEvent(event);
 #ifdef Q_OS_MACOS
     auto* tm = static_cast<Application*>(qApp)->themeManager();
-    MacOSHelper::setWindowBackground(winId(), tm->current() == ThemeManager::Theme::Dark);
+    const bool dark = tm->current() == ThemeManager::Theme::Dark;
+    MacOSHelper::setupFullSizeTitleBar(winId(), dark);
+    MacOSHelper::setWindowBackground(winId(), dark);
 #endif
+}
+
+bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
+    auto* widget = qobject_cast<QWidget*>(obj);
+    const bool inTopBar =
+        widget && (widget == m_topBar || m_topBar->isAncestorOf(widget));
+
+    if (inTopBar) {
+        if (event->type() == QEvent::MouseButtonPress) {
+            auto* me = static_cast<QMouseEvent*>(event);
+            if (me->button() == Qt::LeftButton &&
+                !qobject_cast<QPushButton*>(obj)) {
+                windowHandle()->startSystemMove();
+            }
+        }
+    }
+    return QMainWindow::eventFilter(obj, event);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
@@ -230,7 +259,8 @@ void MainWindow::connectSignals() {
     auto* tm = static_cast<Application*>(qApp)->themeManager();
     connect(tm, &ThemeManager::themeChanged, this,
             [this](ThemeManager::Theme theme) {
-                MacOSHelper::setWindowBackground(winId(), theme == ThemeManager::Theme::Dark);
+                MacOSHelper::setWindowBackground(
+                    winId(), theme == ThemeManager::Theme::Dark);
             });
 #endif
 

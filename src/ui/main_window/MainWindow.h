@@ -16,6 +16,7 @@ protected:
     void showEvent(QShowEvent* event) override;
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
     void setupUi();
@@ -28,4 +29,5 @@ private:
     ImageView* m_imageView = nullptr;
     QLabel* m_metaLabel = nullptr;
     QLabel* m_fileLabel = nullptr;
+    QWidget* m_topBar = nullptr;
 };
