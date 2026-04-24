@@ -2,6 +2,7 @@
 
 #include <QColor>
 #include <QPixmap>
+#include <QTimer>
 #include <QWidget>
 
 class GradientSlider : public QWidget {
@@ -36,4 +37,8 @@ private:
     QPixmap m_thumbNormal;
     QPixmap m_thumbHover;
     QPixmap m_thumbDisabled;
+
+    QTimer m_fpsTimer;
+    int m_paintCount = 0;
+    int m_lastFps = 0;
 };
