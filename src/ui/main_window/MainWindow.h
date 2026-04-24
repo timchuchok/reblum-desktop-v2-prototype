@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QMainWindow>
 
+#include <QTimer>
+
 #include "app/AppController.h"
 #include "ui/widgets/ImageView.h"
 
@@ -29,6 +31,10 @@ private:
     ImageView* m_imageView = nullptr;
     QLabel* m_metaLabel = nullptr;
     QLabel* m_fileLabel = nullptr;
+    QLabel* m_fpsLabel = nullptr;
+    QLabel* m_guiFpsLabel = nullptr;
+    int m_guiPaintCount = 0;
+    QTimer* m_guiFpsTimer = nullptr;
     QWidget* m_metaBadge = nullptr;
     QWidget* m_topBar = nullptr;
     bool m_titleBarConfigured = false;

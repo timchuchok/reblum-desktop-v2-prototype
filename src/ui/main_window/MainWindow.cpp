@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QSizeGrip>
 #include <QStyle>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QWindow>
@@ -216,6 +217,15 @@ void MainWindow::setupUi() {
         fitBtn->setChecked(false);
     });
 
+    m_fpsLabel = new QLabel("GPU – fps", imageSection);
+    m_fpsLabel->setObjectName("FpsLabel");
+
+    m_guiFpsLabel = new QLabel("GUI – fps", imageSection);
+    m_guiFpsLabel->setObjectName("FpsLabel");
+
+    imageSectionLayout->addWidget(m_fpsLabel);
+    imageSectionLayout->addSpacing(12);
+    imageSectionLayout->addWidget(m_guiFpsLabel);
     imageSectionLayout->addStretch();
     imageSectionLayout->addWidget(fitBtn);
     imageSectionLayout->addWidget(zoom100Btn);
@@ -289,6 +299,10 @@ void MainWindow::showEvent(QShowEvent* event) {
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
+    if (event->type() == QEvent::Paint && qobject_cast<QWidget*>(obj)) {
+        ++m_guiPaintCount;
+    }
+
     auto* widget = qobject_cast<QWidget*>(obj);
     const bool inTopBar =
         widget && (widget == m_topBar || m_topBar->isAncestorOf(widget));
@@ -344,6 +358,19 @@ void MainWindow::connectSignals() {
                     winId(), theme == ThemeManager::Theme::Dark);
             });
 #endif
+
+    connect(m_imageView, &ImageView::fpsUpdated, this, [this](int fps) {
+        m_fpsLabel->setText(QString("GPU %1 fps").arg(fps));
+    });
+
+    qApp->installEventFilter(this);
+    m_guiFpsTimer = new QTimer(this);
+    m_guiFpsTimer->setInterval(1000);
+    connect(m_guiFpsTimer, &QTimer::timeout, this, [this]() {
+        m_guiFpsLabel->setText(QString("GUI %1 fps").arg(m_guiPaintCount));
+        m_guiPaintCount = 0;
+    });
+    m_guiFpsTimer->start();
 
     auto syncEffects = [this, ec]() {
         m_imageView->setEffects(ec->orangeSettings(), ec->greenSettings());

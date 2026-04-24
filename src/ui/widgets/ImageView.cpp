@@ -1,6 +1,7 @@
 #include "ImageView.h"
 
 #include <QMouseEvent>
+#include <QTimer>
 #include <QWheelEvent>
 #ifdef Q_OS_MACOS
 #include "platform/MacOSHelper.h"
@@ -11,6 +12,14 @@
 
 ImageView::ImageView(QWidget* parent) : QRhiWidget(parent) {
     setMouseTracking(true);
+
+    m_fpsTimer = new QTimer(this);
+    m_fpsTimer->setInterval(1000);
+    connect(m_fpsTimer, &QTimer::timeout, this, [this]() {
+        emit fpsUpdated(m_frameCount);
+        m_frameCount = 0;
+    });
+    m_fpsTimer->start();
 }
 
 // ── Public API
@@ -65,6 +74,7 @@ void ImageView::initialize(QRhiCommandBuffer*) {
 }
 
 void ImageView::render(QRhiCommandBuffer* cb) {
+    ++m_frameCount;
     m_renderer.render(cb, renderTarget(), imageRect(),
                       static_cast<float>(devicePixelRatio()));
 }

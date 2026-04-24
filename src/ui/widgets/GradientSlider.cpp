@@ -1,6 +1,7 @@
 #include "GradientSlider.h"
 
 #include <QEnterEvent>
+#include <QFont>
 #include <QImage>
 #include <QMouseEvent>
 #include <QPainter>
@@ -27,6 +28,14 @@ GradientSlider::GradientSlider(QColor fromColor, QColor toColor,
     m_thumbNormal = loadThumb(":/icons/slider-thumb.svg");
     m_thumbHover = loadThumb(":/icons/slider-thumb-hover.svg");
     m_thumbDisabled = loadThumb(":/icons/slider-thumb-disabled.svg");
+
+    m_fpsTimer.setInterval(1000);
+    connect(&m_fpsTimer, &QTimer::timeout, this, [this]() {
+        m_lastFps = m_paintCount;
+        m_paintCount = 0;
+        update();
+    });
+    m_fpsTimer.start();
 }
 
 void GradientSlider::setValue(float value) {
@@ -83,6 +92,14 @@ void GradientSlider::paintEvent(QPaintEvent*) {
                                         : m_thumbNormal;
     p.setRenderHint(QPainter::SmoothPixmapTransform);
     p.drawPixmap(fillRight - kHandleR, cy - kHandleR, thumb);
+
+    // ── FPS overlay ───────────────────────────────────────────
+    ++m_paintCount;
+    p.setPen(QColor(180, 180, 180));
+    p.setFont(QFont("Menlo", 8));
+    p.drawText(rect().adjusted(kHandleR, 0, -kHandleR, 0),
+               Qt::AlignRight | Qt::AlignVCenter,
+               QString::number(m_lastFps) + " fps");
 }
 
 void GradientSlider::enterEvent(QEnterEvent*) {

@@ -7,6 +7,8 @@
 #include "core/viewport/ViewState.h"
 #include "rendering/Renderer.h"
 
+class QTimer;
+
 class ImageView : public QRhiWidget {
     Q_OBJECT
 public:
@@ -18,6 +20,9 @@ public:
     void setZoom100();
 
     const ViewState& viewState() const { return m_state; }
+
+signals:
+    void fpsUpdated(int fps);
 
 protected:
     void initialize(QRhiCommandBuffer* cb) override;
@@ -43,4 +48,7 @@ private:
     QPoint m_lastMousePos;
     bool m_panning = false;
     bool m_fitMode = true;
+
+    QTimer* m_fpsTimer = nullptr;
+    int m_frameCount = 0;
 };
